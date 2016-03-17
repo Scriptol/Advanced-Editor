@@ -1,10 +1,8 @@
 var config={
-    "dir": "p:/AEdit/code",
-    "path": "p:/AEdit/code/aedit.ini.js",
+    "dir": "/",
+    "path": "/",
     "theme": "Chaos",
-    "project": "p:/javascript-compiler/test.prj",
+    "project": "",
     "prjList": [
-        "p:/FractalTree/tree.prj",
-        "p:/javascript-compiler/test.prj"
     ]
 }
