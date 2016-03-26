@@ -112,7 +112,7 @@
     position:absolute;
     bottom:0;
     left:0;
-    width:200px;
+    width:196px;
     height:28px;
     background: url("/images/prjback.png");
 }
@@ -254,5 +254,120 @@
 }
 
 
+/* Insert tooltip */
+
+#insert {
+    display:block;
+    position:relative;
+    font-family: Arial,serif;
+}
 
 
+#insert span
+{
+    display:none;
+    color:black;
+    background:white;	
+    font-size:13px;
+}
+
+
+#insert p {
+    margin:6px 2px 2px 8px;
+}
+
+#insert:hover span
+{
+  display:block;
+  position:absolute;
+  top:16px;    
+  left:0;
+  z-index:1000;
+  width:128x;
+  min-width:128px;    
+  max-width:128px;
+  min-height:72px;
+  border:1px solid #666;
+  overflow:visible;
+  padding:0;
+}
+
+#insert h3 {
+    margin:0;
+    padding:3px 3px 1px 0;
+    margin-bottom:4px;
+    background: #E8E8E8;
+    color:#999;
+    font-size:12px;
+    font-weight:bold;
+    text-align:center;
+    border-bottom:1px solid #ccc;
+}
+
+
+
+/* Project tooltip */
+
+#prjSet {
+    display:block;
+    -position:abolute;
+    position:relative;
+    font-family: Arial,serif;
+}
+
+
+#prjSet span
+{
+  display:none;
+  border-radius:8px;
+  color:black;
+  background:white;	
+}
+
+#prjSet span img
+{
+  float:left;
+  margin:0px 8px 8px 0;
+}
+
+#prjSet p {
+    margin:4px 2px 2px 8px;
+}
+
+#prjSet:hover span
+{
+  display:block;
+  position:absolute;
+  left:0;
+  bottom:8px;    
+  z-index:1000;
+  width:196x;
+  min-width:196px;    
+  max-width:196px;
+  min-height:128px;
+  border:2px solid #ccc;
+  overflow:visible;
+  padding:0;
+}
+
+#prjSet h3 {
+    margin:0;
+    padding:3px 3px 1px 0;
+    margin-bottom:4px;
+    background: #E8E8E8;
+    color:#999;
+    font-size:12px;
+    font-weight:bold;
+    text-align:center;
+    border-bottom:1px solid #ccc;
+}
+
+.prjIna {
+    font-weight:normal;
+    color:#666;
+}
+
+.prjAct {
+    font-weight:bold;
+    color:#000;
+}

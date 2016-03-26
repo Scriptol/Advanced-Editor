@@ -25,20 +25,27 @@ Make use of:
     <div class="imagebutton" id="iconas" onclick="save(true)"  alt="Save as"" title="Save as"></div>
 -->    
 <div class="imagebutton" id="new"  onClick="act(this)"><img class="image" src="images/new.png" alt="New blank page" title="New blank page"></div>
-<div class="imagebutton" id="find" onClick="act(this)"><img class="image" src="images/find.png" alt="Search" title="Search"></div>
-<div class="imagebutton" id="next" onClick="act(this)"><img class="image" src="images/next.png" alt="Find next" title="Find next"></div>
-<div class="imagebutton" id="replace" onClick="act(this)"><img class="image" src="images/replace.png" alt="Search & replace" title="Search & replace"></div>
+<div class="imagebutton" id="find" onClick="act(this)"><img class="image" src="images/find.png" alt="Search" title="Search  CTRL-F"></div>
+<div class="imagebutton" id="replace" onClick="act(this)"><img class="image" src="images/replace.png" alt="Search & replace" title="Search & replace  CTRL-H"></div>
 
-<div class="imagebutton" id="outdent" onClick="act(this)"><img class="image" src="images/outdent.png" alt="Outdent" title="Unindent"></div>
-<div class="imagebutton" id="indent"  onClick="act(this)"><img class="image" src="images/indent.png" alt="Indent" title="Indent"></div>
-<div class="imagebutton" id="cut"     onClick="act(this)"><img class="image" src="images/cut.png" alt="Cut" title="Cut"></div>
-<div class="imagebutton" id="copy"    onClick="act(this)"><img class="image" src="images/copy.png" alt="Copy" title="Copy"></div>
-<div class="imagebutton" id="paste"   onClick="act(this)"><img class="image" src="images/paste.png" alt="Paste" title="Paste"></div>
-<div class="imagebutton" id="undo"    onClick="act(this)"><img class="image" src="images/undo.png" alt="Undo" title="Undo"></div>
-<div class="imagebutton" id="redo"    onClick="act(this)"><img class="image" src="images/redo.png" alt="Redo" title="Redo"></div>
-<div class="imagebutton" id="link"    onClick="act(this)"><img class="image" src="images/link.png" alt="Insert Link" title="Insert Link"></div>
-<div class="imagebutton" id="table"   onClick="act(this)"><img class="image" src="images/table.png" alt="Insert Table" title="Insert Table"></div>
-<div class="imagebutton" id="about" onClick="act(this)">
+<div class="imagebutton" id="outdent" onClick="act(this)"><img class="image" src="images/outdent.png" alt="Outdent" title="Unindent  SHIFT-TAB"></div>
+<div class="imagebutton" id="indent"  onClick="act(this)"><img class="image" src="images/indent.png" alt="Indent" title="Indent  TAB"></div>
+<div class="imagebutton" id="cut"     onClick="act(this)"><img class="image" src="images/cut.png" alt="Cut" title="Cut  CTRL-X"></div>
+<div class="imagebutton" id="copy"    onClick="act(this)"><img class="image" src="images/copy.png" alt="Copy" title="Copy  CTRL-C"></div>
+<div class="imagebutton" id="paste"   onClick="act(this)"><img class="image" src="images/paste.png" alt="Paste" title="Paste  CTRL-V"></div>
+<div class="imagebutton" id="undo"    onClick="act(this)"><img class="image" src="images/undo.png" alt="Undo" title="Undo  CTRL-Z"></div>
+<div class="imagebutton" id="redo"    onClick="act(this)"><img class="image" src="images/redo.png" alt="Redo" title="Redo   CTRL-Y"></div>
+<div class="imagebutton" id="insico">
+    <div id="insert">
+        <img class="image" src="images/insert.png" alt="Insert elements" title="Insert elements">
+   <span>
+  <h3>INSERT</h3>
+    <p id="link" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Link</p>   
+    <p id="table" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Table</p>         
+   </span>    
+  </div>  
+</div>    
+    <div class="imagebutton" id="about" onClick="act(this)">
   <img src="images/help.png" id='thelp' width="32" height="32" title="About AEdit">
 </div>
 <div class="imagebutton" id='quit'   onClick="act(this)"><img class="image" src="images/exit.png" alt="Exit" title="Close the editor"></div>
@@ -58,9 +65,14 @@ Make use of:
         </div>
         <div id="prjlist"></div>
         <div id="allprjs">
-            <div id="currprj"></div>
+              <div id="prjSet">
+                <div id="currprj"></div>
+                <span id="listOfPrj">
+                <h3>Projects</h3>
+                </span>    
+              </div>  
         </div>
-    </div>
+        </div>
     <div id="epanel">
         <div id="editor"></div>
         <div id="statusbar">
@@ -78,8 +90,9 @@ Make use of:
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 1.0</p>
+          <p>Version 1.1</p>
           <p>&copy; 2016 Denis Sureau<br>www.scriptol.com<br></p>
+          <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
           <input type="button" id="hideme" onClick="act(this)" value="Close" /> 
           </p>      
@@ -88,7 +101,7 @@ Make use of:
     
 <script>
 var contentToSave = false;
-var socket = new WebSocket("ws://localhost:1030");
+var socket = new WebSocket("ws://localhost:1034");
 var editor = ace.edit("editor");
 var project = [];
 var root;
@@ -234,7 +247,7 @@ function display(data)
     if("project" in data && data.project != null) {
         project = data.project.list;
         config.project = data.project.name;
-        NEWdOCeditor.scrollToLine(getActiveRow(AEditFileName));
+        editor.scrollToLine(getActiveRow());
         updateProjectName();        
     }
     projectDisplay();  
@@ -244,7 +257,7 @@ function display(data)
 
 /* Project Management */
 
-function openDoc(filepath){
+function getSource(filepath){
 	var a = { 
     'app' : 'explorer', 
     'params': { 
@@ -258,12 +271,12 @@ function openDoc(filepath){
     );
 }
 
-function getActiveRow(fname) 
+function getActiveRow() 
 {
-    if(!(project instanceof Object)) return;
+    if(project ===  null) return;
     for(var i = 0; i < project.list.length; i++)
     {
-        if(fname == project.list[i][0])  
+        if(AEditFileName == project.list[i][0])  
             return project.list[i][1];
     }
     return 0;
@@ -331,8 +344,11 @@ function createProject() {
     if(!(config.prjList instanceof Array)) {
         config["prjList"] = [];
     } 
-    config.prjList.push(name);
+    addToProjects(name);
     currentInProject=null;
+    config.project = name;
+    saveIni("/code/aedit.ini.js")     
+    updateTooltip();
     return true;
 }    
     
@@ -348,7 +364,7 @@ function projectDisplay() {
         var fname = extractFile(path);
         //alert(i + " " + AEditFileName + " x " + path)
         var flag = (AEditFileName == path);
-        content += '<p title="' + path + '" onclick="openDoc(this.title)">';
+        content += '<p title="' + path + '" onclick="getSource(this.title)">';
         if(flag)  {
             content += '<b>'+fname+'</b></p>';
             currentInProject = path;
@@ -358,7 +374,6 @@ function projectDisplay() {
         }
     }
     d.innerHTML = content;
-    //alert("curr prjk " + config.project)
     var c = document.getElementById("currprj");
     c.innerHTML =  extractNode(extractFile(config.project)).toUpperCase();
     c.setAttribute("title", config.project);
@@ -407,6 +422,7 @@ function addFileToList() {
     saveProject();
 }
     
+    
 function updateProjectName(name)
 {
     if(config.project != name) { 
@@ -421,11 +437,58 @@ function closeProject() {
     document.getElementById("prjlist").innerHTML="";
     document.getElementById("currprj").innerHTML="";
 }
+    
+function selectProject(elem) {
+    var pname = elem.getAttribute("title");
+    loadProject(pname);
+}   
 
+    
+function addToProjects(name) {
+    for(var i=0; i < config.prjList.length;i++) {
+        if(config.prjList[i] === name) return;
+    }  
+    config.prjList.push(name);
+    config.prjList.sort(function (a, b) {
+      var af = extractFile(a);
+      var bf = extractFile(b);
+      return af.localeCompare(bf);
+    } );    
+}   
+    
+function setIna(elem) {
+    elem.setAttribute("class", "prjIna");
+}
+    
+function setAct(elem) {
+    elem.setAttribute("class", "prjAct");
+}     
+    
+function updateTooltip() {
+    var tt = document.getElementById("listOfPrj");
+    tt.innerHTML = "<h3>PROJECTS</h3>";
+    for(var i=0; i < config.prjList.length;i++) {
+        var title= config.prjList[i];
+        var name = extractFile(title);
+        tt.innerHTML += "<p class='prjIna' title='"+title+"' onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='selectProject(this)'>" + name+"</p>";
+    }
+}
+   
+function manual() {
+    var ifr=document.createElement("iframe")
+    var ap=document.getElementById("apanel")
+    ap.innerHTML = "";
+    ap.style.padding="0";
+    ap.appendChild(ifr);
+    ifr.style.width="100%";
+    ifr.style.height="100%";
+    ifr.src="manual.html";
+}    
 
 function quit() {
-  if(contentToSave) save(true);
   setActiveRow();
+  if(contentToSave) save(true);
+  saveProject();    
   saveFromAE('code/aedit.ini.js', config);
   var a = { 'app' : 'explorer', 'params': { 'command': 'quit', }  };
   sendFromInterface(a);
@@ -501,6 +564,9 @@ function act(element)
         case "hideme":
             hideMe()
             break;
+        case "manual":
+            manual();
+            break;
 		case "quit":
 			quit();
 			break;	
@@ -530,12 +596,15 @@ socket.onmessage = function(event) {
         if(data.project instanceof Object)  {  
             project = data.project; 
             config.project = project.name
+            saveIni("/code/aedit.ini.js")  
+            addToProjects(project.name)
+            updateTooltip();    
         }
-            //alert("pr " + JSON.stringify(project, null, ' '))
+            
+            //alert("open doc pr " + JSON.stringify(project, null, ' '))
+        setActiveRow();
         clearDoc();
         AEditFileName = data.filename;
-        setActiveRow();
-            //alert("openDOC " + event.data)
         displayFileName();
         if(data.content.length > 127) {
           editor.setValue(data.content.slice(9), -1);
@@ -547,11 +616,13 @@ socket.onmessage = function(event) {
         if(data.ext in languageExt)   
             mode = "ace/mode/" + languageExt[data.ext];
         editor.getSession().setMode(mode); 
-        var row = getActiveRow(AEditFileName);   
+        var row = getActiveRow();   
+            //alert("row=" + row + " " + AEditFileName)
         editor.scrollToLine(row);
-        projectDisplay();  
+        projectDisplay(); 
         changedStatus(false);
         editor.focus();
+            //alert("break")
         break
     case "editor":
         if(data.action == "prompt") {
@@ -630,7 +701,7 @@ function load()
 }  
     
 function loadProject(name)
-{   //alert("prj " + config.project)
+{   
     var a = { 'app' : 'explorer', 'params': { 'command': 'openPrj', 'name': name } };
     socket.send(JSON.stringify( { "type":"interface", "data": a }));  
 }    
@@ -662,16 +733,13 @@ function save(pflag)
     editor.focus();
     setActiveRow();
     var content = editor.getValue();
-    
     if(content.length == 0) return; 
-    //updateStatusBar(x);
-    //changedStatus(false);
     var a = { 'app' : 'explorer', 'params': { 
 	            'command': 'save', 
 				'filename': AEditFileName, 
 				'content' : content,
 				'overwrite' : true 
-				}};
+	}};
     socket.send(JSON.stringify( { "type":"interface", "data": a }));  
 }
 
@@ -700,12 +768,10 @@ function buildtable(editor)
 
 
 window.onload=function() {
-  //var ib = document.getElementById("ibrowse");
-  //ib.addEventListener("change", readFile, false);
     lastPanel = document.getElementById("epanel");   
     display(null);
+    updateTooltip();
 }
-
 
 
 </script>

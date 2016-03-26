@@ -6,7 +6,7 @@
   Use it freely but keep this copyright notice. 
 */
 
-var socket = new WebSocket("ws://localhost:1030");
+var socket = new WebSocket("ws://localhost:1034");
 var form = "";
 
 function addLabel(value)

@@ -12,7 +12,7 @@ var http = require("http"),
     fs = require("fs");
 
 var WebSocketServer = require("ws").Server;
-var websocket = new WebSocketServer( { port: 1030 } );
+var websocket = new WebSocketServer( { port: 1034 } );
 var explorer = require("explorer");
 
 
@@ -132,7 +132,7 @@ function webComm(websocket)
 
 function loadBrowser(filename)
 {
-	var param="http://localhost:1032/" + filename;
+	var param="http://localhost:1036/" + filename;
 	var browserName = explorer.config.browser;
     var browser = explorer.config[browserName];
     if(browserName=='')
@@ -156,10 +156,10 @@ function loadBrowser(filename)
 
 var tiloidOS = explorer.loadIni("aedit.ini");
 var server = http.createServer(getFilename); // Create a server to display the interface
-server.listen(1032);
+server.listen(1036);
 console.log("Server available...");
 loadBrowser('aedit.html');
-console.log("Browser loaded. Port 1030 ready.");
+console.log("Browser loaded. Port 1034 ready.");
 
 var socket;
 
@@ -183,10 +183,10 @@ var nativeServer = net.createServer(function(ncom) {
 });
 
 //nativeServer.setTimeout(0);
-nativeServer.listen(1031, '127.0.0.1');
+nativeServer.listen(1035, '127.0.0.1');
 
 // Create a websocket connection
-console.log("WebSocket started on port 1030.");
+console.log("WebSocket started on port 1034.");
 websocket.on('connection', function (w) { 
   socket = w;
   webComm(w);} 

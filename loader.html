@@ -27,7 +27,7 @@ License GPL 3.0
 
 <script>
 
-var socket = new WebSocket("ws://localhost:1030");
+var socket = new WebSocket("ws://localhost:1034");
 
 function addKeyListEvents(target) { 
   target=null; // nothing
@@ -60,10 +60,7 @@ function loadToEdit() {
     
 function loadProject() {
   var pname = document.getElementById("lcontentpath").value
-  config.project = pname;
-  saveIni("/code/aedit.ini.js")
   parent.loadProject(pname)  
-  parent.projectDisplay()
   parent.restartEditor()
 }    
 

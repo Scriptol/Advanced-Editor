@@ -21,7 +21,7 @@ var ChooserDrag = null;
 
 var customview = [];
 
-var socket = new WebSocket("ws://localhost:1030");
+var socket = new WebSocket("ws://localhost:1034");
 
 // event
 
@@ -488,17 +488,19 @@ function sel(element)
     deselectAll(element.parentNode);
     element.className="entrybold"; 
     var filepath =  element.getAttribute("data-url"); 
-    SyncPath.value = filepath;
-    var pbutton = document.getElementById("prjButton");
-    if(pbutton instanceof HTMLInputElement) { 
-        var p = filepath.lastIndexOf('.');
-        var ext = filepath.slice(p + 1);
-        if(ext == "prj") {       
-            pbutton.style.display="inline-block"
-        } 
-        else {
-            pbutton.style.display="none"
-        }
+    if(filepath != null) {
+        SyncPath.value = filepath;
+        var pbutton = document.getElementById("prjButton");
+        if(pbutton instanceof HTMLInputElement) { 
+            var p = filepath.lastIndexOf('.');
+            var ext = filepath.slice(p + 1);
+            if(ext == "prj") {       
+                pbutton.style.display="inline-block"
+            } 
+            else {
+                pbutton.style.display="none"
+            }
+     }
     }
   }    
   chooserLastSelected = element;
