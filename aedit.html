@@ -90,7 +90,7 @@ Make use of:
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 1.1</p>
+          <p>Version 1.2</p>
           <p>&copy; 2016 Denis Sureau<br>www.scriptol.com<br></p>
           <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
@@ -654,6 +654,11 @@ var lastPanel;
     
 function about() {
     var apanel = document.getElementById("apanel")
+	if(apanel.style.display == "block") {
+    	lastPanel.style.display="block"    
+    	apanel.style.display="none"
+		return;
+	}
     lastPanel.style.display="none"    
     apanel.style.display="block"
 }
