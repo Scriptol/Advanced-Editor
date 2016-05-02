@@ -17,7 +17,7 @@ License GPL 3.0
 	  <div id="fspath" oncontextmenu="return false">
         <div id="pathlabel"> SAVE TO </div> 
         <div id="pathcontrol">
-      	  <input type="text" class="innpath" id="scontentpath" size="40" value="/">
+      	  <input type="text" class="innpath" id="scontentpath" size="40" value="/" onKeyUp="chgPath(this)">
           <input type="button" class="bpath button bgray" value="Cancel" onclick="cancel()"/>
           <input type="button" class="bpath bsave button bblue" value="Save" onclick="saveConfirmed()"/>
         </div>

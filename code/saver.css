@@ -85,11 +85,8 @@
 {
 	border:1px dotted black;
 	background-color: #F0F0F0;
-	background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
-	background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
 	background-image: linear-gradient(top, #ffffff, #e6e6e6);
 	background-repeat: repeat-x;
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0)	
 }
 
 .entrybold, .entrybold:hover
@@ -102,9 +99,7 @@
  	border:1px dotted black;
 	border-radius:3px;	 
 	background-color: #B0B0F0;
-	background-image: -moz-linear-gradient(top, #E0F0FF, #B0DEF2);
-	background-image: -webkit-linear-gradient(top, #E0F0FF, #B0DEF2);
-	background-image: linear-gradient(top, #E0F0FF, #B0DEF2);
+	background-image: linear-gradient(to top, #E0F0FF, #B0DEF2);
 	background-repeat: repeat-x;	
 }
 
@@ -116,7 +111,7 @@
 }
 .fsimg {
 	width:22px;
-	heigth:22px;
+	height:22px;
 }
 
 
@@ -142,7 +137,6 @@
 	margin:0;
 	padding:0 0px 0 8px;
 	box-sizing: border-box; 
-	-background:green;    
 }
 
 #pathlabel {
@@ -171,7 +165,6 @@
 	padding-left:8px;
 	margin:0 0 4px 0;
 	border-radius:4px;
-	-box-shadow: 1px 2px 2px 4px rgba(128,128,128,0.5);	
 }
 .bpath {
 	font-family: Arial, Helvetica, sans-serif;
@@ -182,6 +175,43 @@
 .bsave {
 	background:green;
 }
+
+
+.ctxmenu
+{
+  position:absolute;	
+  width: 128px;
+  height:auto;
+  min-height:40px;
+  padding: 8px;
+  margin:0;
+  left:0px;
+  border: 1px solid #999;
+  background: #F8F8F8;
+  box-shadow: 2px 2px 2px #AAA;
+  z-index:1000;
+  overflow: visible;
+  font-weight:normal;
+}
+
+.ctxline
+{
+	display:block;
+	margin:0px;
+	padding:2px 2px 2px 8px;
+	border:1px solid #F8F8F8;
+	border-radius:3px;
+	font-size:13px;
+	font-family:Arial, Helvetica, sans-serif;
+	overflow:visible;
+}
+.ctxline:hover
+{
+	border:1px solid #BBB;
+	background-color: #F0F0F0;
+	background-image: linear-gradient(to top, #ffffff, #e6e6e6);
+	background-repeat: repeat-x;
+}  
 
 
 /* Buttons: Copyright 2011-2015 Nutraide.com/Scriptol.com */
@@ -213,15 +243,11 @@
 	background: #09c;
 	box-shadow: inset 1px 1px 1px 0 rgba(255,255,255,0.6),
 		1px 2px 4px 0 rgba(128,128,128,0.8);
-	background: -webkit-gradient(linear, left top, left bottom, from(#0bf), to(#08a));
-	background: -moz-linear-gradient(top,  #00adee,  #0078a5);
-	background: inear-gradient(to top left,  #00adee,  #0078a5);
+	background: linear-gradient(to top left,  #00adee,  #0078a5);
 }
 .bblue:hover
 {
 	background: #08B;
-	background: -webkit-gradient(linear, left top, left bottom, from(#0ad), to(#068));
-	background: -moz-linear-gradient(top,  #0095cc,  #006688);
 	background: linear-gradient(to top left,   #006688, #0095cc,);
 }
 
@@ -231,15 +257,11 @@
 	background-color:#F03;
 	box-shadow: inset 1px 1px 1px 0 rgba(255,255,255,0.6),
 		1px 2px 4px 0 rgba(128,128,128,0.8);
-	background:-webkit-gradient(linear, left top, left bottom, from(#F03), to(#A02));
-	background:-moz-linear-gradient(top,  #F04,  #A02);
 	background:linear-gradient(to top left,  #F04,  #A02);
 }
 .bred.button:hover
 {
 	background-color:#dd0011;
-	background:-webkit-gradient(linear, left top, left bottom, from(#E02), to(#600));
-	background:-moz-linear-gradient(top,  #E02,  #600);
 	background:linear-gradient(to top left,  #E02,  #600);
 }
 .bgreen.button
@@ -248,16 +270,12 @@
 	background-color:#0F3;
 	box-shadow: inset 1px 1px 1px 0 rgba(255,255,255,0.6),
 		1px 2px 4px 0 rgba(128,128,128,0.8);
-	background:-webkit-gradient(linear, left top, left bottom, from(#0F3), to(#0A2));
-	background:-moz-linear-gradient(top,  #0F4,  #0A2);
 	background:linear-gradient(to top left,  #0F4,  #0A2);
 }
 .bgreen.button:hover
 {
 	background-color:#00dd11;
-	background:-webkit-gradient(linear, left top, left bottom, from(#0E2), to(#060));
-	background:-moz-linear-gradient(top,  #0E2,  #060);
-	-background:linear-gradient(to top left,  #0E2,  #060);
+	background:linear-gradient(to top left,  #0E2,  #060);
 }
 .bgray.button
 {
@@ -268,18 +286,12 @@
 	box-shadow: inset 1px 1px 1px 0 rgba(255,255,255,0.6),
 		1px 2px 4px 0 rgba(128,128,128,0.8);
 	background: #ccc;
-	background: -webkit-gradient(linear, left top, left bottom, from(#eee), to(#bbb));
-	background: -moz-linear-gradient(top,  #eeeeee,  #bbb);
 	background: linear-gradient(to top left,  #bbb, #eee  );
-	-text-shadow: 0 1px 1px rgba(255,255,255,.3);
 }
 .bgray.button:hover
 {
 	background-color:#999;
-	background: -webkit-gradient(linear, left top, left bottom, from(#ddd), to(#666));
-	background: -moz-linear-gradient(top,  #ddd,  #666);
 	background: linear-gradient(to top left,  #999,  #ddd);
 	color:#DDD;
-	-text-shadow: 0 1px 1px rgba(0,0,0,.3);
 }
 

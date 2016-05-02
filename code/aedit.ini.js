@@ -1,12 +1,8 @@
 var config={
-    "dir": "p:/AEdit",
-    "path": "p:/AEdit/aedit.ini",
+    "dir": "/",
+    "path": "/",
     "theme": "Chaos",
-    "project": "p:/Archives/AE-JBuilder/test.prj",
+    "project": "",
     "prjList": [
-        "p:/AExplorer/aexplo.prj",
-        "p:/Fabric/fabric.prj",
-        "p:/Archives/AE-JBuilder/test.prj",
-        "p:/FractalTree/tree.prj"
     ]
 }

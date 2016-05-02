@@ -90,7 +90,7 @@ Make use of:
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 1.2</p>
+          <p>Version 1.3</p>
           <p>&copy; 2016 Denis Sureau<br>www.scriptol.com<br></p>
           <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
@@ -590,6 +590,7 @@ function changedStatus(status)
     
 socket.onmessage = function(event) {
     var data = JSON.parse(event.data);
+    //alert(data.type)
     switch(data.type) 
     {
     case "openDoc":
@@ -599,12 +600,13 @@ socket.onmessage = function(event) {
             saveIni("/code/aedit.ini.js")  
             addToProjects(project.name)
             updateTooltip();    
+            //alert("open doc pr " + JSON.stringify(project, null, ' '))
         }
             
-            //alert("open doc pr " + JSON.stringify(project, null, ' '))
         setActiveRow();
         clearDoc();
         AEditFileName = data.filename;
+            //alert("data="+ event.data)
         displayFileName();
         if(data.content.length > 127) {
           editor.setValue(data.content.slice(9), -1);

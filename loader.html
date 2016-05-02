@@ -17,7 +17,7 @@ License GPL 3.0
 	    <div id="fspath" oncontextmenu="return false">
             <div id="pathlabel" style="color:#093">LOAD</div> 
             <div id="pathcontrol">
-      	    <input type="text" class="innpath" id="lcontentpath" size="45" value="/">
+      	    <input type="text" class="innpath" id="lcontentpath" size="45" value="/"  onKeyUp="chgPath(this)">
             <input type="button" class="bpath button bgray" value="Cancel" onclick="cancel()"/>
             <input type="button" class="bpath bsave button bgreen" value="Edit" onclick="loadToEdit()"/>    
             <input type="button" class="bpath bsave button bgreen" id="prjButton" style="display:none" value="Load" onclick="loadProject()"/>
@@ -32,6 +32,7 @@ var socket = new WebSocket("ws://localhost:1034");
 function addKeyListEvents(target) { 
   target=null; // nothing
 }
+
 
 function setLoadPath() {
   SyncPath = document.getElementById("lcontentpath")  // SyncPath from FileList
@@ -78,14 +79,14 @@ socket.onmessage = function(event) {
   }           
 };        
 
-function fileAccess(target)
+function fileAccess()
 {
 	var query = { 
     'app' : 'explorer', 
     'params': { 
         'path' : config.dir, 
         'command': 'saveas', 
-        'target': target,
+        'target': "lcontent",
         'drag' : false 
         } 
   };
@@ -94,7 +95,7 @@ function fileAccess(target)
 
 function startLoader()
 {
-  fileAccess("lcontent");
+  fileAccess();
 }
 
   

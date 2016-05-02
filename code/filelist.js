@@ -1,7 +1,7 @@
 /* File Chooser
    File input replacement with path and default value
    for local use of JavaScript on the desktop.
-   (c) 2012-2014 By Denis Sureau.
+   (c) 2012-2016 By Denis Sureau.
    
    License LGPL 3.0.
    Free to use provided this copyright notice is not removed.
@@ -377,7 +377,7 @@ function view(element, filepath, panelid, forcePage)
 		a.params.filename = filepath;
 		a.params.path = getNameSelected(element);
 		a.params.target = panelid;
-    sendFromInterface(a);
+        sendFromInterface(a);
 		return;
 	 }
   }
@@ -542,30 +542,23 @@ function getPointedContent(panelName)
 
 function edit(element)
 {
-  var target = pointFile(element);
-	var filename =  getNameSelected(element);
-	var a = { 'app' : 'explorer',
-			  'params': { 
-          'command': 'getContent', 
-          'path': filename, 
-          'target': target
-        }
-	};
-	
-	sendFromInterface(a);
+  var f = element.getAttribute("data-url");
+  parent.AEditFileName = f
+  parent.load()
+  config.dir = extractDir(f)
+  config.path = f;
+  saveIni("/code/aedit.ini.js")
+  parent.restartEditor()    
 }
 
-function openProject(element)
-{
-  var target = pointFile(element);
-	var filename =  getNameSelected(element);
-	var a = { 'app' : 'explorer',  'params': { 
-                'command': 'openPrj', 
-                'name': filename, 
-                'target': target 
-            } };
-	sendFromInterface(a);
-}
+
+function openProject(element) {
+  var pname =  element.getAttribute("data-url");
+  parent.loadProject(pname)  
+  parent.restartEditor()
+}  
+
+
 
 function open(element, forcePage)
 {
@@ -593,26 +586,19 @@ function rsel(element)
   
   var parent = element.parentNode; 
   var isImage;
-  var isExecutable = false;
-  var isZip = false;
   var ext = getNameSelected(element);
   var epos = ext.lastIndexOf('.');
 	ext = ext.slice(epos + 1);  
   switch(ext.toLowerCase())
   {
-    case 'exe':
-    case 'jar':
-      isExecutable = true;
-      break;
     case 'gif':
     case 'png':
     case 'jpg':
     case 'jpeg':
       isImage = true;
       break;
-    case 'zip':
-      isZip = true;  
-    default: isImage = false;
+    default: 
+      isImage = false;
   }
  
   var d = document.createElement('div');
@@ -635,15 +621,7 @@ function rsel(element)
   p.setAttribute('class', 'ctxline');
   p.innerHTML = "Open"; 
   
-  if(isExecutable)
-  {
-    var pe = document.createElement('p');
-    d.appendChild(pe);
-    pe.onclick=function() { run(element, true); };
-    pe.setAttribute('class', 'ctxline');
-    pe.innerHTML = "Run";    
-  }   
-  
+ 
   if(isImage)
   {
     var pi = document.createElement('p');
@@ -653,14 +631,6 @@ function rsel(element)
     pi.innerHTML = "Full view";    
   }
 
-  if(isZip)
-  {
-    var pe = document.createElement('p');
-    d.appendChild(pe);
-    pe.onclick=function() { keyUnzip(); };
-    pe.setAttribute('class', 'ctxline');
-    pe.innerHTML = "Unzip";    
-  }   
     
   var p2 = document.createElement('p');
   d.appendChild(p2);
@@ -684,16 +654,6 @@ function openDir(element)
   var target = pointFile(element);
   var dirname = getNameSelected(element);
   chDir(dirname, target, false);
-}
-
-function run(element)
-{
-  var target = pointFile(element);
-  var fname = getNameSelected(element);
-	var a = { 'app' : 'explorer',
-			  'params': { 'command': 'execute', 'target': target, 'filename': fname }
-	};  
-  sendFromInterface(a); 
 }
 
 
@@ -919,3 +879,94 @@ document.onkeydown=function(evt)
   return true;
 }
 
+// Drive selection
+
+var sto = null;
+function chgPath(elem) {
+    if(sto != null) clearTimeout(sto);
+    sto = setTimeout(function() {
+        var npath = document.getElementById(elem.id).value;
+        config.dir = extractDir(npath);
+        fileAccess();
+    }, 1500);
+}
+
+function alreadyInList(parent, name)
+{
+	var child = parent.firstChild; // child of flist
+	while(child)
+	{
+    if(getNameSelected(child) == name)
+      return true;
+		child = child.nextSibling;
+	}
+  return false;
+}
+
+function acceptRename(oldname, newname)
+{
+	var a = { 'app' : 'explorer',
+			  'params': { 'command': 'rename', 'target': null, 'oldname': oldname, 'newname' : newname }
+	};
+
+	parent.sendFromInterface(a);
+}
+
+var elementRename = function(spanitem)
+{
+	var saved = spanitem.innerHTML;
+    var path = extractDir(spanitem.getAttribute("data-url"))
+	var p1 = saved.indexOf('>');
+	var p2 = saved.indexOf('<', p1);
+    if(p2 == -1)
+        p2 = saved.length;
+	var oldname = saved.slice(p1 + 1, p2);
+    oldname = noHTMLchars(oldname);
+
+	var x = document.createElement("input");
+	x.setAttribute('type', 'text');
+	x.setAttribute('value', oldname);
+	x.setAttribute('size', '40');
+
+    x.onkeypress = function(evt) {
+    evt.stopPropagation();
+  	var code = evt.keyCode || evt.which;
+		
+    if(code == 13)
+    {
+		var newname = x.value;
+		if(newname)
+		{
+            if(alreadyInList(spanitem.parentNode, newname))
+            {
+            alert("Name already used");
+            }
+            else
+            {
+				  acceptRename(path + "/" + oldname, path + "/" + newname);
+				  saved = saved.slice(0, p1 + 1) + newname + saved.slice(p2);
+            }
+		}
+		x.blur();
+    }
+    else
+    if(evt.ctrlKey)
+    switch(code)
+    {
+      case 17: 	x.blur();
+            break;
+    }
+
+	};
+
+  x.onkeydown = function(evt) {
+     evt.stopPropagation();
+  }
+
+	x.onblur = function(evt) {
+		spanitem.innerHTML = saved;
+	};
+	spanitem.innerHTML = "";
+	spanitem.appendChild(x);
+	x.focus();
+}
