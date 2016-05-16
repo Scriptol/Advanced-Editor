@@ -886,8 +886,11 @@ function chgPath(elem) {
     if(sto != null) clearTimeout(sto);
     sto = setTimeout(function() {
         var npath = document.getElementById(elem.id).value;
-        config.dir = extractDir(npath);
-        fileAccess();
+        var lastchar = npath.substr(npath.length - 1)
+        if(lastchar == "/" || lastchar == "\\") {  
+            config.dir = extractDir(npath);
+            fileAccess();
+        }
     }, 1500);
 }
 
@@ -930,6 +933,7 @@ var elementRename = function(spanitem)
 
     x.onkeypress = function(evt) {
     evt.stopPropagation();
+  	var code = evt.keyCode || evt.which;
   	var code = evt.keyCode || evt.which;
 		
     if(code == 13)
