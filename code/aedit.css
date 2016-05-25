@@ -48,6 +48,19 @@
     margin:0;
 }
 
+.buttonInput 
+{
+	display:inline-block;
+	margin-right:2px;
+    box-sizing: border-box;	
+	height:34px;
+	width: 64px;
+    float:left;
+}
+#line {
+    margin-top:4px;
+}
+
 #main {
 	position: absolute;
 	top: 44px;
@@ -256,14 +269,14 @@
 
 /* Insert tooltip */
 
-#insert {
+.insert {
     display:block;
     position:relative;
     font-family: Arial,serif;
 }
 
 
-#insert span
+.insert span
 {
     display:none;
     color:black;
@@ -272,11 +285,11 @@
 }
 
 
-#insert p {
+.insert p {
     margin:6px 2px 2px 8px;
 }
 
-#insert:hover span
+.insert:hover span
 {
   display:block;
   position:absolute;
@@ -292,7 +305,7 @@
   padding:0;
 }
 
-#insert h3 {
+.insert h3 {
     margin:0;
     padding:3px 3px 1px 0;
     margin-bottom:4px;

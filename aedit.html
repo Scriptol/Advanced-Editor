@@ -28,6 +28,21 @@ Make use of:
 <div class="imagebutton" id="find" onClick="act(this)"><img class="image" src="images/find.png" alt="Search" title="Search  CTRL-F"></div>
 <div class="imagebutton" id="replace" onClick="act(this)"><img class="image" src="images/replace.png" alt="Search & replace" title="Search & replace  CTRL-H"></div>
 
+<div class="imagebutton" id="go">
+    <div class="insert">
+        <img class="image" src="images/go.png" alt="Go to location" title="Go to location">
+   <span id="golist">
+  <h3>Go to...</h3>
+    <p id="top" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Top</p>   
+    <p id="bottom" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Bottom</p>
+   </span>    
+  </div>  
+</div> 
+
+<div class="buttonInput" id="line"  alt="Go to line" title="Go to line">
+   <input id="line" type="text" size="4" value="" onKeyUp="goline(this)">
+</div>
+
 <div class="imagebutton" id="outdent" onClick="act(this)"><img class="image" src="images/outdent.png" alt="Outdent" title="Unindent  SHIFT-TAB"></div>
 <div class="imagebutton" id="indent"  onClick="act(this)"><img class="image" src="images/indent.png" alt="Indent" title="Indent  TAB"></div>
 <div class="imagebutton" id="cut"     onClick="act(this)"><img class="image" src="images/cut.png" alt="Cut" title="Cut  CTRL-X"></div>
@@ -36,7 +51,7 @@ Make use of:
 <div class="imagebutton" id="undo"    onClick="act(this)"><img class="image" src="images/undo.png" alt="Undo" title="Undo  CTRL-Z"></div>
 <div class="imagebutton" id="redo"    onClick="act(this)"><img class="image" src="images/redo.png" alt="Redo" title="Redo   CTRL-Y"></div>
 <div class="imagebutton" id="insico">
-    <div id="insert">
+    <div class="insert">
         <img class="image" src="images/insert.png" alt="Insert elements" title="Insert elements">
    <span>
   <h3>INSERT</h3>
@@ -90,7 +105,7 @@ Make use of:
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 1.3</p>
+          <p>Version 1.4</p>
           <p>&copy; 2016 Denis Sureau<br>www.scriptol.com<br></p>
           <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
@@ -485,6 +500,16 @@ function manual() {
     ifr.src="manual.html";
 }    
 
+var lst=null;  
+function goline(element) {
+    if(lst != null) clearTimeout(lst);
+    lst=setTimeout(function() {
+        var lnum = element.value;
+        element.value="";
+        editor.gotoLine(lnum,0);
+    }, 1500);
+}
+
 function quit() {
   setActiveRow();
   if(contentToSave) save(true);
@@ -549,6 +574,12 @@ function act(element)
 		case "next":	
 			editor.findNext();
 			break;
+        case "top":
+            editor.gotoLine(0,0)
+            break;  
+        case "bottom":
+            editor.gotoLine(99990,0)
+            break;                
 		case "table":
 			buildtable(editor);
 			break;
