@@ -640,10 +640,10 @@ socket.onmessage = function(event) {
             //alert("data="+ event.data)
         displayFileName();
         if(data.content.length > 127) {
-          editor.setValue(data.content.slice(9), -1);
+          editor.session.setValue(data.content.slice(9), -1);
         }
         else {
-		  editor.setValue(data.content, -1);
+		  editor.session.setValue(data.content, -1);
         }
         var mode = "plain_text";
         if(data.ext in languageExt)   

@@ -1,6 +1,6 @@
 /*
-  Advanced Explorer Node server
-	(c) 2012-2015 Denis Sureau
+  Advanced Editor Node server
+	(c) 2012-2016 Denis Sureau
 	Free, open source under the GPL 3 License.
 */
 
@@ -70,28 +70,28 @@ function runScript(exists, file, param) // Run a local script at the Web interfa
   }
 
   console.log("Running...");
-  
+
   var r = runner.exec(file, param,// { env: childEnv },
-    function(err, stdout, stderr) { 
+    function(err, stdout, stderr) {
       console.log(stderr);
     }
   );
   console.log(file + " launched by the server...");
   r.on('exit', function (code) {
     console.log('Local script terminated.');
-  });  
-  
+  });
+
 }
 
 function webComm(websocket)
 {
   console.log("Server: WebSocket activated by the browser...")
   websocket.on( 'message' , function (e)
-  { 
+  {
       var jo = JSON.parse(e);
-      var data = jo.data;     
-      //console.log("MESSAGE " + JSON.stringify(data)) 
-      if(jo.type== "answer") 
+      var data = jo.data;
+      //console.log("MESSAGE " + JSON.stringify(data))
+      if(jo.type== "answer")
       {
         switch(data.command)
          {
@@ -99,32 +99,32 @@ function webComm(websocket)
               explorer.shell(websocket, fs, data);
               break;
             default:
-              break;  
-         }     
+              break;
+         }
         return;
       }
 
-      if(jo.type == "interface") 
+      if(jo.type == "interface")
       {
 		    var app = data.app;
 		    var params = data.params;
             switch(app)
-	         {   
+	         {
 		    	   case 'explorer':
 			 	        console.log(" ");
 				        explorer.shell(websocket, fs, params);
 				        break;
              default:
 				        var filename = params.path;
-				        fs.exists(filename, function(result) { 
+				        fs.exists(filename, function(result) {
 				          runScript(result, app, filename + " " + params)});
-                }   
+                }
 	         }
      else
         console.log("Unknow message type from browser...");
   });
-  
-  websocket.on('close', function() { 
+
+  websocket.on('close', function() {
     console.log("Server: WebSocket connection closed by the browser.")
   });
 }
@@ -140,15 +140,15 @@ function loadBrowser(filename)
       browser = explorer.config.chrome;
       browserName='Chrome';
     }
-    
+
     console.log('Loading browser: '+ browser);
 
 	fs.exists(browser, function(result) {
 		if(!result) { console.log("File not found " + browser); return 0; }
 		var command = browser +  " " + param;
 		console.log("Running " + command);
-		runner.exec(command, function(err, stdout, stderr) { 
-        console.log("Terminated. "+ stderr); 
+		runner.exec(command, function(err, stdout, stderr) {
+        console.log("Terminated. "+ stderr);
     });
 	});
 
@@ -164,20 +164,20 @@ console.log("Browser loaded. Port 1034 ready.");
 var socket;
 
 // Create a TCP server to communicate with native script
-var nativeServer = net.createServer(function(ncom) { 
+var nativeServer = net.createServer(function(ncom) {
 
     console.log('Native connection activated: ' + ncom.remoteAddress +':'+ ncom.remotePort);
     ncom.setEncoding("utf8");
 
     ncom.on("error", function(err) {
       console.log("TCP error: " + err.stack);
-    });    
-    ncom.on('data', function(data) { 
+    });
+    ncom.on('data', function(data) {
         console.log("Script to browser: " + data);
         socket.send(data);
     });
-    ncom.on('end',  function() {  
-      console.log('Native connection closed.');  
+    ncom.on('end',  function() {
+      console.log('Native connection closed.');
     });
 
 });
@@ -187,7 +187,7 @@ nativeServer.listen(1035, '127.0.0.1');
 
 // Create a websocket connection
 console.log("WebSocket started on port 1034.");
-websocket.on('connection', function (w) { 
+websocket.on('connection', function (w) {
   socket = w;
-  webComm(w);} 
+  webComm(w);}
 );

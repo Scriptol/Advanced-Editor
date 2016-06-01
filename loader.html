@@ -1,5 +1,5 @@
 <!--
-Advanced Editor File Load Dialog (c) 2012-2015 Denis Sureau
+Advanced Editor File Load Dialog (c) 2012-2016 Denis Sureau
 License GPL 3.0
 -->
 <html>
@@ -15,11 +15,11 @@ License GPL 3.0
 <div id="main">
     <div id="lcontent"></div>
 	    <div id="fspath" oncontextmenu="return false">
-            <div id="pathlabel" style="color:#093">LOAD</div> 
+            <div id="pathlabel" style="color:#093">LOAD</div>
             <div id="pathcontrol">
       	    <input type="text" class="innpath" id="lcontentpath" size="45" value="/"  onKeyUp="chgPath(this)">
             <input type="button" class="bpath button bgray" value="Cancel" onclick="cancel()"/>
-            <input type="button" class="bpath bsave button bgreen" value="Edit" onclick="loadToEdit()"/>    
+            <input type="button" class="bpath bsave button bgreen" value="Edit" onclick="loadToEdit()"/>
             <input type="button" class="bpath bsave button bgreen" id="prjButton" style="display:none" value="Load" onclick="loadProject()"/>
         </div>
     </div>
@@ -29,7 +29,7 @@ License GPL 3.0
 
 var socket = new WebSocket("ws://localhost:1034");
 
-function addKeyListEvents(target) { 
+function addKeyListEvents(target) {
   target=null; // nothing
 }
 
@@ -41,9 +41,9 @@ function setLoadPath() {
 }
 
 function cancel() {
-  parent.restartEditor(); 
+  parent.restartEditor();
 }
-    
+
 function extractDir(fname)  {
     var p = fname.lastIndexOf("/")
     return fname.slice(0, p)
@@ -58,16 +58,16 @@ function loadToEdit() {
   saveIni("/code/aedit.ini.js")
   parent.restartEditor()
 }
-    
+
 function loadProject() {
   var pname = document.getElementById("lcontentpath").value
-  parent.loadProject(pname)  
+  parent.loadProject(pname)
   parent.restartEditor()
-}    
+}
 
 socket.onmessage = function(event) {
   var jobj =   JSON.parse(event.data);
-  //alert(jobj.type)   
+  //alert(jobj.type)
   switch(jobj.type) {
     case 'dirdata':
         //alert("DIRDATA")
@@ -75,31 +75,31 @@ socket.onmessage = function(event) {
           config.path = jobj.path;
         break;
     default:
-        //alert(jobj.type)    
-  }           
-};        
+        //alert(jobj.type)
+  }
+};
 
 function fileAccess()
 {
-	var query = { 
-    'app' : 'explorer', 
-    'params': { 
-        'path' : config.dir, 
-        'command': 'saveas', 
+	var query = {
+    'app' : 'explorer',
+    'params': {
+        'path' : config.dir,
+        'command': 'saveas',
         'target': "lcontent",
-        'drag' : false 
-        } 
+        'drag' : false
+        }
   };
   sendFromInterface(query);
-}	
+}
 
 function startLoader()
 {
   fileAccess();
 }
 
-  
-</script>	
+
+</script>
 
 </body>
 </html>

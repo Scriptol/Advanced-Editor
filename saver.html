@@ -1,5 +1,5 @@
 <!--
-Advanced Editor / Advanced Exploer File Save Dialog (c) 2012-2015 Denis Sureau
+Advanced Editor / Advanced Exploer File Save Dialog (c) 2012-2016 Denis Sureau
 License GPL 3.0
 -->
 <html>
@@ -15,7 +15,7 @@ License GPL 3.0
 <div id="main">
     <div id="scontent"></div>
 	  <div id="fspath" oncontextmenu="return false">
-        <div id="pathlabel"> SAVE TO </div> 
+        <div id="pathlabel"> SAVE TO </div>
         <div id="pathcontrol">
       	  <input type="text" class="innpath" id="scontentpath" size="40" value="/" onKeyUp="chgPath(this)">
           <input type="button" class="bpath button bgray" value="Cancel" onclick="cancel()"/>
@@ -28,23 +28,23 @@ License GPL 3.0
 
 var socket = new WebSocket("ws://localhost:1034");
 
-function addKeyListEvents(target) { 
+function addKeyListEvents(target) {
   target=null; // nothing
 }
 
 function setSavePath() {
   SyncPath = document.getElementById("scontentpath")
-  parent.AEditSyncPath = SyncPath;  
+  parent.AEditSyncPath = SyncPath;
 }
 
 function cancel() {
-  parent.restartEditor(); 
+  parent.restartEditor();
 }
-    
+
 function extractDir(fname)  {
     var p = fname.lastIndexOf("/")
     return fname.slice(0, p)
-}    
+}
 
 function saveConfirmed() {
   var f = document.getElementById("scontentpath").value
@@ -55,7 +55,7 @@ function saveConfirmed() {
   saveIni("/code/aedit.ini.js")
   parent.restartEditor();
 }
-    
+
 
 socket.onmessage = function(event) {
   var jobj =   JSON.parse(event.data);
@@ -65,31 +65,31 @@ socket.onmessage = function(event) {
         break;
     case 'confirm':
         //saverConfirm(jobj);
-        break;    
+        break;
     case 'dirdata':
         //alert(JSON.stringify(jobj, null, ' '))
         fileList(jobj, 0);
         config.path = jobj.path;
         break;
     default:
-        //alert(jobj.type)    
-  }           
-};        
+        //alert(jobj.type)
+  }
+};
 
 function fileAccess()
 {
-  if(config.path == '') { config.path = "/";  }  
-	var query = { 
-    'app' : 'explorer', 
-    'params': { 
-        'path' : config.dir, 
-        'command': 'saveas', 
+  if(config.path == '') { config.path = "/";  }
+	var query = {
+    'app' : 'explorer',
+    'params': {
+        'path' : config.dir,
+        'command': 'saveas',
         'target': 'scontent',
-        'drag' : false 
-        } 
+        'drag' : false
+        }
   };
   sendFromInterface(query);
-}	
+}
 
 function startSaver()
 {
@@ -101,9 +101,9 @@ function exitSaver()
 	var fredit = document.getElementById("editor");
 	var fc = fredit.contentDocument;
     fc.setActiveRow();
-}  
-  
-</script>	
+}
+
+</script>
 
 </body>
 </html>

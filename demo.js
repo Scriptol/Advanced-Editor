@@ -7,15 +7,14 @@ function Eratosthenes(element, top)
   var x, j;
 
   element.innerHTML = "1 ";
-	
+
   while(prime <= top)   {
     var flag = true;
     for(x = 0; x < top; x++) {
-        if(all[x] == prime) 
-        {
+        if(all[x] == prime)  {
             flag = false;
             break;
-        }	
+        }
     }
     if(flag)  {
         element.innerHTML += prime + " ";
@@ -30,3 +29,6 @@ function Eratosthenes(element, top)
   element.innerHTML += "<br>";
   return;
 }
+
+
+test
