@@ -21,9 +21,6 @@ Make use of:
 <div id="toolbar">
 <div class="imagebutton" id="load" onClick="act(this)"><img class="image" src="images/open.png" alt="Load" title="Load a file"></div>
 <div class="imagebutton" id="save" onClick="act(this)"><img class="image" src="images/save.png" alt="Save" title="Save to file"></div>
-<!--
-    <div class="imagebutton" id="iconas" onclick="save(true)"  alt="Save as"" title="Save as"></div>
--->    
 <div class="imagebutton" id="new"  onClick="act(this)"><img class="image" src="images/new.png" alt="New blank page" title="New blank page"></div>
 <div class="imagebutton" id="find" onClick="act(this)"><img class="image" src="images/find.png" alt="Search" title="Search  CTRL-F"></div>
 <div class="imagebutton" id="replace" onClick="act(this)"><img class="image" src="images/replace.png" alt="Search & replace" title="Search & replace  CTRL-H"></div>
@@ -105,7 +102,7 @@ Make use of:
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 1.4</p>
+          <p>Version 1.5</p>
           <p>&copy; 2016 Denis Sureau<br>www.scriptol.com<br></p>
           <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
@@ -149,9 +146,9 @@ var languageExt = {
 editor.setTheme("ace/theme/dreamweaver");
 editor.getSession().setMode("ace/mode/html"); 
 editor.getSession().on('change', function() { 
-            if(contentToSave == false)
-                changedStatus(true);
-        }
+    if(contentToSave == false)
+       changedStatus(true);
+    }
 );
 		
 editor.commands.addCommand({
@@ -371,15 +368,12 @@ function projectDisplay() {
     if(!(project instanceof Object)) return;
     var d = document.getElementById("prjlist");
     var content = "";
-    //alert("Project display")
-    //alert(JSON.stringify(project, null, ' '))
     for(var i = 0; i < project.list.length; i++) {
         var path = project.list[i][0];
         if(path == undefined || path == "") continue;
         var fname = extractFile(path);
-        //alert(i + " " + AEditFileName + " x " + path)
         var flag = (AEditFileName == path);
-        content += '<p title="' + path + '" onclick="getSource(this.title)">';
+        content += '<p title="' + path + '" onclick="getSource(this.title)" oncontextmenu="return prjCtxMenu(this)">';
         if(flag)  {
             content += '<b>'+fname+'</b></p>';
             currentInProject = path;
@@ -421,6 +415,15 @@ function removeFromPrj() {
 
 
 function addFileToList() {
+    if(AEditFileName == undefined || AEditFileName == "") {
+        var name=prompt("File name (full path):", root);
+        if(name==null) {
+            alert("Not added.");
+            return false;
+        }
+        AEditFileName=name
+    }
+
     createProject();
     if(indexInProject(AEditFileName) != -1) {
         alert("Already included!");
@@ -488,6 +491,45 @@ function updateTooltip() {
         tt.innerHTML += "<p class='prjIna' title='"+title+"' onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='selectProject(this)'>" + name+"</p>";
     }
 }
+
+function prjCtxMenu(elem)
+{
+  var x = document.getElementById('ctx1');
+  if(x) x.parentNode.removeChild(x); 
+  
+  var parent = elem.parentNode; 
+  var d = document.createElement('div');
+  parent.appendChild(d);
+
+  d.id = 'ctx1';
+  d.className = 'ctxmenu';
+  var mx = elem.offsetLeft - elem.scrollLeft + elem.clientLeft + 32;
+  var my = elem.offsetTop - elem.scrollTop + elem.clientTop +8;  
+  d.style.left = mx + "px";
+  d.style.top = my + "px";
+  d.onmouseover = function(e) { this.style.cursor = 'pointer'; } 
+  d.onclick = function(e) { parent.removeChild(d);  }
+  document.body.onclick = function(e) {
+    try { parent.removeChild(d);}
+    catch(e) {}   
+  }
+  
+  var p = document.createElement('p');
+  d.appendChild(p);
+  p.onclick=function() {
+      var temp = currentInProject  
+      currentInProject = elem.title
+      removeFromPrj() 
+      currentInProject = temp
+      projectDisplay()
+  };
+  p.setAttribute('class', 'ctxline');
+  p.innerHTML = "Delete"; 
+  
+  return false;
+}
+
+/* Project end */
    
 function manual() {
     var ifr=document.createElement("iframe")
@@ -621,7 +663,6 @@ function changedStatus(status)
     
 socket.onmessage = function(event) {
     var data = JSON.parse(event.data);
-    //alert(data.type)
     switch(data.type) 
     {
     case "openDoc":
@@ -631,13 +672,11 @@ socket.onmessage = function(event) {
             saveIni("/code/aedit.ini.js")  
             addToProjects(project.name)
             updateTooltip();    
-            //alert("open doc pr " + JSON.stringify(project, null, ' '))
         }
             
         setActiveRow();
         clearDoc();
         AEditFileName = data.filename;
-            //alert("data="+ event.data)
         displayFileName();
         if(data.content.length > 127) {
           editor.session.setValue(data.content.slice(9), -1);
@@ -650,12 +689,10 @@ socket.onmessage = function(event) {
             mode = "ace/mode/" + languageExt[data.ext];
         editor.getSession().setMode(mode); 
         var row = getActiveRow();   
-            //alert("row=" + row + " " + AEditFileName)
         editor.scrollToLine(row);
         projectDisplay(); 
         changedStatus(false);
         editor.focus();
-            //alert("break")
         break
     case "editor":
         if(data.action == "prompt") {
@@ -809,6 +846,10 @@ window.onload=function() {
     lastPanel = document.getElementById("epanel");   
     display(null);
     updateTooltip();
+    setTimeout(function() {
+        var pname = config.project;
+        loadProject(pname);
+    }, 1000);
 }
 
 

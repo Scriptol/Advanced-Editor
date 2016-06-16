@@ -31,4 +31,3 @@ function Eratosthenes(element, top)
 }
 
 
-test
