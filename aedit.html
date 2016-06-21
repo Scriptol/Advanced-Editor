@@ -285,7 +285,7 @@ function getSource(filepath){
 
 function getActiveRow() 
 {
-    if(project ===  null) return;
+    if(project==null) return;
     for(var i = 0; i < project.list.length; i++)
     {
         if(AEditFileName == project.list[i][0])  
@@ -524,7 +524,7 @@ function prjCtxMenu(elem)
       projectDisplay()
   };
   p.setAttribute('class', 'ctxline');
-  p.innerHTML = "Delete"; 
+  p.innerHTML = "Remove"; 
   
   return false;
 }
