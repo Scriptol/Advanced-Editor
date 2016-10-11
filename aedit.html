@@ -102,7 +102,7 @@ Make use of:
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 1.5</p>
+          <p>Version 1.6</p>
           <p>&copy; 2016 Denis Sureau<br>www.scriptol.com<br></p>
           <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
@@ -207,28 +207,37 @@ function displayFileName() {
     fno.setAttribute("title", AEditFileName);
 }
 
-    
-function newDoc()
-{
+function saveDoc() {
 	var temp = editor.getValue();
 	if(temp.length > 0)
 	{
         var sb = prompt("Save current content?", AEditFileName);
-        if(sb != null && sb != "") save(false);
-	}
+        if(sb != null && sb != "") return save(false);
+        return false; // abort
+	}    
+    return true; // continue
+}
+    
+function newDoc()
+{
+    if(contentToSave) {
+      var rep = saveDoc()
+      if(rep === false) return false; // abort
+    }     
     AEditFileName = "";
     updateStatusBar("");
+    return true;  // saved
 }
 
 
 function clearDoc()
 {
-    if(contentToSave) newDoc(); 
-    AEditFileName="";
+    if(newDoc() == false) return false; 
     displayFileName();     
     editor.session.setValue("");
     restartEditor();      
     changedStatus(false);    
+    return true;
 }
 
 var project = undefined;
@@ -338,6 +347,7 @@ function indexInProject(fname)  {
 } 
     
 var currentInProject = null;    
+
 function createProject() {
     if(project instanceof Object) return true;
     root = extractDir(AEditFileName);
@@ -450,7 +460,7 @@ function updateProjectName(name)
 }    
 
 function closeProject() {
-    project={};
+    project=null;
     updateProjectName("");
     document.getElementById("prjlist").innerHTML="";
     document.getElementById("currprj").innerHTML="";
@@ -554,7 +564,9 @@ function goline(element) {
 
 function quit() {
   setActiveRow();
-  if(contentToSave) save(true);
+  if(contentToSave) {
+      if(saveDoc() === false) return;
+  }    
   saveProject();    
   saveFromAE('code/aedit.ini.js', config);
   var a = { 'app' : 'explorer', 'params': { 'command': 'quit', }  };
@@ -666,6 +678,7 @@ socket.onmessage = function(event) {
     switch(data.type) 
     {
     case "openDoc":
+        if(clearDoc() == false) break;   // save aborted         
         if(data.project instanceof Object)  {  
             project = data.project; 
             config.project = project.name
@@ -675,7 +688,6 @@ socket.onmessage = function(event) {
         }
             
         setActiveRow();
-        clearDoc();
         AEditFileName = data.filename;
         displayFileName();
         if(data.content.length > 127) {
@@ -696,7 +708,7 @@ socket.onmessage = function(event) {
         break
     case "editor":
         if(data.action == "prompt") {
-		        var p = prompt(data.message);
+		    var p = prompt(data.message);
             socket.send(JSON.stringify( { "type":"answer", "data": p != null }));
         }
         else {
@@ -798,12 +810,12 @@ function option() {
     lastPanel = opanel
 }
 
-function save(pflag)
+function save(winflag)
 {
     //alert("save " + pflag + " " + AEditFileName)
-    if(pflag || AEditFileName == undefined || AEditFileName == "") {
-        winsave(editor) 
-        return;
+    var nflag = AEditFileName == undefined || AEditFileName == "";
+    if(winflag || nflag)  { 
+        return winsave() 
     }
     editor.focus();
     setActiveRow();
