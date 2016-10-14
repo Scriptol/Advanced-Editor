@@ -3,7 +3,7 @@ Advanced Editor
 (c) 2016 Denis Sureau
 License Creative Common
 
-Based on Advanced Explorer (c) 2012-2016 D. Sureau
+Based on Advanced Explorer JE (c) 2012-2016 D. Sureau
 
 Make use of:
 * Ace Editor API, under the BSD Licence.
@@ -678,6 +678,7 @@ socket.onmessage = function(event) {
     switch(data.type) 
     {
     case "openDoc":
+        setActiveRow();
         if(clearDoc() == false) break;   // save aborted         
         if(data.project instanceof Object)  {  
             project = data.project; 
@@ -687,7 +688,6 @@ socket.onmessage = function(event) {
             updateTooltip();    
         }
             
-        setActiveRow();
         AEditFileName = data.filename;
         displayFileName();
         if(data.content.length > 127) {
