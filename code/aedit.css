@@ -1,4 +1,4 @@
-/* Advanced Editor (c) 2016 Scriptol.com 
+/* Advanced Editor (c) 2012-2017 Scriptol.com 
    Based on  Advanced Explorer (c) 2012 Scriptol.com
 */
 #body, html
@@ -17,7 +17,7 @@
     right:0;
     display:block;
 	height: 36px; 
-	background: url("/images/back.png");
+	background: url("../images/back.png");
 	border:1px solid #CCC;
 	border-radius:4px;
 	padding:4px 8px 0px 8px;
@@ -94,7 +94,7 @@
 	padding:4px;
 	margin:0;
 	overflow:hidden;
-	background: url("/images/prjback.png");
+	background: url("../images/prjback.png");
 	padding:4px 4px 0px 4px;
 }
 
@@ -127,7 +127,7 @@
     left:0;
     width:196px;
     height:28px;
-    background: url("/images/prjback.png");
+    background: url("../images/prjback.png");
 }
 
 #currprj {
@@ -193,7 +193,7 @@
     right:0;
     bottom:0;    
     height:28px;
-    background: url("/images/prjback.png");
+    background: url("../images/prjback.png");
     padding:2px;
     margin-top:-32px;
     box-sizing: border-box;

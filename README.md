@@ -1,7 +1,7 @@
 # Advanced Editor
 
 Programming editor based on the Ace engine.
-Require Node.js, a browser and WS (included).
+Require Electron or Node.js and a browser, requires the WS module (included).
 
 This source code editor is well-suited for switching frequently between several projects.
 

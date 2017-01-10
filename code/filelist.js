@@ -1,15 +1,15 @@
 /* File Chooser
    File input replacement with path and default value
    for local use of JavaScript on the desktop.
-   (c) 2012-2016 By Denis Sureau.
+   (c) 2012-2017 By Denis Sureau.
    
    License LGPL 3.0.
    Free to use provided this copyright notice is not removed.
 
    Requires:
-   - Node.js.
+   - Node.js or Electron.
    - A WebSocket connection opened with the server.
-   - The Explorer.js module.
+   - The explorer.js module.
 */
 
 
@@ -89,7 +89,7 @@ function buildDrive(pathname, id)
 function buildDir(pathname, id)
 {
 	var balise ="<div class='dir' onDblClick='chDir(\"" + pathname + "\",\"" + id + "\")' onClick='sel(this)' oncontextmenu='return dsel(this)'>";
-  balise += '<img src="/images/dir.png">';
+  balise += '<img src="images/dir.png">';
 	balise += pathname;
 	balise += "</div>";
 	return(balise);
@@ -114,13 +114,13 @@ function buildLink(filepath, fname, panelid, timesize, filedate, ext)
     case 'jpg':
     case 'png':
     case 'jpeg':
-          balise += '/images/img.png';
+          balise += 'images/img.png';
           break;
     case 'htm':
     case 'html':
     case 'php':
     case 'asp':
-          balise += '/images/web.png';
+          balise += 'images/web.png';
           break;  
     /*      
     case 'zip':
@@ -132,17 +132,17 @@ function buildLink(filepath, fname, panelid, timesize, filedate, ext)
           break; 
     */      
     case 'prj':
-          balise += '/images/prj.png';
+          balise += 'images/prj.png';
           break;
     case 'steps':
-          balise += '/images/steps.png';
+          balise += 'images/steps.png';
           break;   
     case 'lstp':
-          balise += '/images/lstp.png';
+          balise += 'images/lstp.png';
           break;
     case 'jvg':      
     case 'svg':                               
-          balise += '/images/svg.png';
+          balise += 'images/svg.png';
           break;
     case 'c':
     case 'cpp':
@@ -161,10 +161,10 @@ function buildLink(filepath, fname, panelid, timesize, filedate, ext)
     case 'sql':
     case 'ts':    
     case 'xml': 
-          balise += '/images/code.png';
+          balise += 'images/code.png';
           break;
     default:
-          balise += '/images/doc.png'
+          balise += 'images/doc.png'
     }
     balise += '">'; 
     balise += fname;

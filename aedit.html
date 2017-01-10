@@ -1,9 +1,9 @@
 <!--
 Advanced Editor  
-(c) 2016 Denis Sureau
+(c) 2016-2017 Denis Sureau
 License Creative Common
 
-Based on Advanced Explorer JE (c) 2012-2016 D. Sureau
+Based on Advanced Explorer JE (c) 2012-2017 D. Sureau
 
 Make use of:
 * Ace Editor API, under the BSD Licence.
@@ -12,6 +12,7 @@ Make use of:
 <html lang="en">
 <head>
 <title>Advanced Editor</title>
+<base href="/AEdit/" target="_top">      
 <link type="text/css" href="code/aedit.css" rel="stylesheet">
 <script src="src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 <script src="code/javascript-ini.js"></script>    
@@ -102,8 +103,8 @@ Make use of:
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 1.6</p>
-          <p>&copy; 2016 Denis Sureau<br>www.scriptol.com<br></p>
+          <p>Version 2.0</p>
+          <p>&copy; 2016-2017 Denis Sureau<br>www.scriptol.com<br></p>
           <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
           <input type="button" id="hideme" onClick="act(this)" value="Close" /> 
@@ -665,9 +666,9 @@ function changedStatus(status)
 {
 	var chg = document.getElementById("changed");
 	if(status)
-		chg.src="/images/changed.png";
+		chg.src="images/changed.png";
 	else
-		chg.src="/images/saved.png";		
+		chg.src="images/saved.png";		
     contentToSave = status;  
 }
 
@@ -856,13 +857,14 @@ function buildtable(editor)
 
 window.onload=function() {
     lastPanel = document.getElementById("epanel");   
-    display(null);
-    updateTooltip();
-    setTimeout(function() {
+    socket.onopen = function(event) {
+        display(null);
+        updateTooltip();
         var pname = config.project;
         loadProject(pname);
-    }, 1000);
+    }
 }
+    
 
 
 </script>

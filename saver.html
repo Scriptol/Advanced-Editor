@@ -1,10 +1,11 @@
 <!--
-Advanced Editor / Advanced Exploer File Save Dialog (c) 2012-2016 Denis Sureau
+Advanced Editor File Save Dialog (c) 2012-2017 Denis Sureau
 License GPL 3.0
 -->
 <html>
 <head>
 <title>AE Saver</title>
+<base href="/AEdit/" target="_top">   
 <link type="text/css" href="code/saver.css" rel="stylesheet">
 <script src="code/filelist.js" type="text/javascript"></script>
 <script src="code/aedit.ini.js"></script>
@@ -52,7 +53,7 @@ function saveConfirmed() {
   parent.save(false)
   config.dir = extractDir(f)
   config.path = f;
-  saveIni("/code/aedit.ini.js")
+  saveIni("code/aedit.ini.js")
   parent.restartEditor();
 }
 
@@ -67,7 +68,6 @@ socket.onmessage = function(event) {
         //saverConfirm(jobj);
         break;
     case 'dirdata':
-        //alert(JSON.stringify(jobj, null, ' '))
         fileList(jobj, 0);
         config.path = jobj.path;
         break;
