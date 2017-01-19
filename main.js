@@ -177,7 +177,7 @@ console.log("Starting Electron...")
 
 function createWindow () {
   win = new BrowserWindow({width: 960, height: 600, "show":false
-//    , "webPreferences" : { "nodeIntegration":false }  
+    , "webPreferences" : { "nodeIntegration":false }  
   });
   win.setMenu(null)
   
@@ -192,7 +192,7 @@ function createWindow () {
 
   win.show()
   
-  win.webContents.openDevTools()
+  //win.webContents.openDevTools()
   
   win.on('closed', () => {
     win = null
