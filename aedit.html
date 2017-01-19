@@ -97,6 +97,9 @@ Make use of:
     <div id="spanel">
             <iframe id="saver" src="saver.html" width="640" height="500"></iframe>
     </div>
+    <div id="cpanel">
+            <iframe id="creator" src="creator.html" width="640" height="500"></iframe>
+    </div>
     <div id="opanel">
             <iframe id="options" src="settings.html" width="640" height="500"></iframe>
     </div>
@@ -112,6 +115,7 @@ Make use of:
 </div> <!--main-->
     
 <script>
+    
 var contentToSave = false;
 var socket = new WebSocket("ws://localhost:1034");
 var editor = ace.edit("editor");
@@ -183,6 +187,7 @@ editor.commands.addCommand({
     	}
 	}
 	);	
+    
     
 function sendFromInterface(a) {
   socket.send(
@@ -348,17 +353,25 @@ function indexInProject(fname)  {
     
 var currentInProject = null;    
 
-function createProject() {
-    if(project instanceof Object) return true;
-    root = extractDir(AEditFileName);
-    var name=prompt("Project name (full path):", root);
-    if(name==null) {
-        alert("Not created.");
-        config.project="";
-        return false;
-    }
-    if(name.lastIndexOf(".") == -1)
+function projectwindow(label, dflt) {    
+    var cpanel = document.getElementById("cpanel")
+    var creator = document.getElementById("creator")
+    var fc = (creator.contentWindow || creator.contentDocument);
+    lastPanel.style.display="none"    
+    cpanel.style.display="block"
+    lastPanel = cpanel
+    fc.startCreator() 
+    fc.setCreatePath(); 
+    return fc;     
+}
+
+
+function createEnd() {
+    var name = ProjectName;
+    if(name.lastIndexOf(".") == -1) {
         name += ".prj";
+        ProjectName = name;
+    }
     updateProjectName(name); 
     project = {};
     project["name"]= name;
@@ -367,13 +380,39 @@ function createProject() {
         config["prjList"] = [];
     } 
     addToProjects(name);
+
     currentInProject=null;
     config.project = name;
     saveIni("/code/aedit.ini.js")     
     updateTooltip();
-    return true;
+    if(indexInProject(AEditFileName) != -1) {
+        alert("Already included!");
+        return;
+    }
+    project.list.push([AEditFileName, editor.getFirstVisibleRow()]);
+    project.list.sort(function (a, b) {
+      var af = extractFile(a[0]);
+      var bf = extractFile(b[0]);
+      return af.localeCompare(bf);
+    } );
+    projectDisplay();
+    currentInProject = AEditFileName;
+    saveProject();    
 }    
     
+function createProject() {
+    if(project instanceof Object) return true;
+    root = extractDir(AEditFileName);
+    var fc=projectwindow("Project name", root);
+    if(fc==null || fc===false) {
+        alert("Not created.");
+        config.project="";
+        return false;
+    }
+    return true;
+}    
+   
+
 function projectDisplay() {
     if(!(project instanceof Object)) return;
     var d = document.getElementById("prjlist");
@@ -425,29 +464,13 @@ function removeFromPrj() {
 
 
 function addFileToList() {
+    
     if(AEditFileName == undefined || AEditFileName == "") {
-        var name=prompt("File name (full path):", root);
-        if(name==null) {
-            alert("Not added.");
-            return false;
-        }
-        AEditFileName=name
+        alert("Save the file before to add to a project.")
+        return;
     }
 
     createProject();
-    if(indexInProject(AEditFileName) != -1) {
-        alert("Already included!");
-        return;
-    }
-    project.list.push([AEditFileName, editor.getFirstVisibleRow()]);
-    project.list.sort(function (a, b) {
-      var af = extractFile(a[0]);
-      var bf = extractFile(b[0]);
-      return af.localeCompare(bf);
-    } );
-    projectDisplay();
-    currentInProject = AEditFileName;
-    saveProject();
 }
     
     

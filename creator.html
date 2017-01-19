@@ -1,10 +1,10 @@
 <!--
-Advanced Editor File Save Dialog (c) 2012-2017 Denis Sureau
+Advanced Editor File Maker (c) 2012-2017 Denis Sureau
 License GPL 3.0
 -->
 <html>
 <head>
-<title>AE Saver</title>
+<title>AE Creator</title>
 <link type="text/css" href="code/saver.css" rel="stylesheet">
 <script src="code/filelist.js" type="text/javascript"></script>
 <script src="code/aedit.ini.js"></script>
@@ -13,13 +13,13 @@ License GPL 3.0
 <body>
 
 <div id="main">
-    <div id="scontent"></div>
+    <div id="content"></div>
 	  <div id="fspath" oncontextmenu="return false">
-        <div id="pathlabel"> SAVE TO </div>
+        <div id="pathlabel"> NEW PROJECT </div>
         <div id="pathcontrol">
-      	  <input type="text" class="innpath" id="scontentpath" size="40" value="/">
+      	  <input type="text" class="innpath" id="contentpath" size="40" value="/">
           <input type="button" class="bpath button bgray" value="Cancel" onclick="cancel()"/>
-          <input type="button" class="bpath bsave button bblue" value="Save" onclick="saveConfirmed()"/>
+          <input type="button" class="bpath bsave button bblue" value="Create" onclick="createConfirmed()"/>
         </div>
     </div>
 </div>
@@ -32,8 +32,8 @@ function addKeyListEvents(target) {
   target=null; // nothing
 }
 
-function setSavePath() {
-  SyncPath = document.getElementById("scontentpath")
+function setCreatePath() {
+  SyncPath = document.getElementById("contentpath")
   parent.AEditSyncPath = SyncPath;
 }
 
@@ -46,32 +46,25 @@ function extractDir(fname)  {
     return fname.slice(0, p)
 }
 
-function saveConfirmed() {
-  var f = document.getElementById("scontentpath").value
-  parent.AEditFileName  = f
-  parent.save(false)
+function createConfirmed() {
+  var f = document.getElementById("contentpath").value
+  parent.ProjectName  = f
   config.dir = extractDir(f)
   config.path = f;
   saveIni("code/aedit.ini.js")
-  parent.restartEditor();
+  parent.createEnd();
+  parent.restartEditor();  
 }
 
 
 socket.onmessage = function(event) {
   var jobj =   JSON.parse(event.data);
   switch(jobj.type) {
-    case 'notification':
-        //saverNotification(jobj);
-        break;
-    case 'confirm':
-        //saverConfirm(jobj);
-        break;
     case 'dirdata':
         fileList(jobj, 0);
         config.path = jobj.path;
         break;
     default:
-        //alert(jobj.type)
   }
 };
 
@@ -83,14 +76,14 @@ function fileAccess()
     'params': {
         'path' : config.dir,
         'command': 'saveas',
-        'target': 'scontent',
+        'target': 'content',
         'drag' : false
         }
   };
   sendFromInterface(query);
 }
 
-function startSaver()
+function startCreator()
 {
     fileAccess();
 }

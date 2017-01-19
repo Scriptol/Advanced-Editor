@@ -11,7 +11,7 @@ const http = require("http"),
     net = require('net'),
     fs = require("fs");
 
-const {app, BrowserWindow} = require('electron')
+const {app, BrowserWindow} = require('electron');
 
 const WebSocketServer = require("ws").Server;
 const websocket = new WebSocketServer( { port: 1034 } );
@@ -176,9 +176,11 @@ console.log("Starting Electron...")
 
 
 function createWindow () {
-  win = new BrowserWindow({width: 960, height: 600, "show":false });
+  win = new BrowserWindow({width: 960, height: 600, "show":false
+//    , "webPreferences" : { "nodeIntegration":false }  
+  });
   win.setMenu(null)
-
+  
   process.resourcesPath = __dirname
   console.log("Working directory : " + process.resourcesPath)
 
@@ -190,7 +192,7 @@ function createWindow () {
 
   win.show()
   
-  //win.webContents.openDevTools()
+  win.webContents.openDevTools()
   
   win.on('closed', () => {
     win = null
