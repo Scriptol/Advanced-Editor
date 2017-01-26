@@ -71,8 +71,8 @@ Make use of:
 <div id="main">
     <div id="project">
         <div id="prjbar">
-            <img class="pimage" src="images/prjadd.png" title="Add from project directory" onclick="addFileToList()">
-            <img class="pimage" src="images/prjrem.png" title="Remove selected file(s)"  onclick="removeFromPrj()">
+            <img class="pimage" src="images/prjadd.png" title="Add file to current project" onclick="addFileToList()">
+            <img class="pimage" src="images/prjrem.png" title="Remove selected file from project"  onclick="removeFromPrj()">
             <img class="primage" src="images/prjexit.png" title="Close the project" onclick="closeProject()">
         </div>
         <div id="prjlist"></div>
@@ -344,6 +344,8 @@ function extractNode(fname) {
     return fname.substr(0, p)
 }
 
+/* Project management */    
+    
 function indexInProject(fname)  {
     for(var i = 0; i < project.list.length; i++) {
         if(project.list[i][0]==fname) return i;
@@ -365,6 +367,25 @@ function projectwindow(label, dflt) {
     return fc;     
 }
 
+function addFileToCurrentProject(name) {    
+    currentInProject=null;
+    config.project = name;
+    saveIni("aedit.ini.js")     
+    updateTooltip();
+    if(indexInProject(AEditFileName) != -1) {
+        alert("Already exists!");
+        return;
+    }
+    project.list.push([AEditFileName, editor.getFirstVisibleRow()]);
+    project.list.sort(function (a, b) {
+      var af = extractFile(a[0]);
+      var bf = extractFile(b[0]);
+      return af.localeCompare(bf);
+    } );
+    projectDisplay();
+    currentInProject = AEditFileName;
+    saveProject();       
+}
 
 function createEnd() {
     var name = ProjectName;
@@ -379,37 +400,21 @@ function createEnd() {
     if(!(config.prjList instanceof Array)) {
         config["prjList"] = [];
     } 
-    addToProjects(name);
-
-    currentInProject=null;
-    config.project = name;
-    saveIni("aedit.ini.js")     
-    updateTooltip();
-    if(indexInProject(AEditFileName) != -1) {
-        alert("Already included!");
-        return;
-    }
-    project.list.push([AEditFileName, editor.getFirstVisibleRow()]);
-    project.list.sort(function (a, b) {
-      var af = extractFile(a[0]);
-      var bf = extractFile(b[0]);
-      return af.localeCompare(bf);
-    } );
-    projectDisplay();
-    currentInProject = AEditFileName;
-    saveProject();    
+    addProject(name);
+    addFileToCurrentProject();
+ 
 }    
     
 function createProject() {
-    if(project instanceof Object) return true;
+    if(project instanceof Object) return 1;
     root = extractDir(AEditFileName);
     var fc=projectwindow("Project name", root);
     if(fc==null || fc===false) {
         alert("Not created.");
         config.project="";
-        return false;
+        return 0;
     }
-    return true;
+    return 2;
 }    
    
 
@@ -470,7 +475,9 @@ function addFileToList() {
         return;
     }
 
-    createProject();
+    if(createProject() == 1) {
+        addFileToCurrentProject(config.project);
+    }
 }
     
     
@@ -495,9 +502,11 @@ function selectProject(elem) {
 }   
 
     
-function addToProjects(name) {
+function addProject(name) {
     for(var i=0; i < config.prjList.length;i++) {
-        if(config.prjList[i] === name) return;
+        if(config.prjList[i] === name) {
+            return;
+        }
     }  
     config.prjList.push(name);
     config.prjList.sort(function (a, b) {
@@ -505,7 +514,9 @@ function addToProjects(name) {
       var bf = extractFile(b);
       return af.localeCompare(bf);
     } );    
-}   
+}  
+    
+/* end of project */    
     
 function setIna(elem) {
     elem.setAttribute("class", "prjIna");
@@ -704,7 +715,7 @@ socket.onmessage = function(event) {
             project = data.project; 
             config.project = project.name
             saveIni("aedit.ini.js")  
-            addToProjects(project.name)
+            addProject(project.name)
             updateTooltip();    
         }
             

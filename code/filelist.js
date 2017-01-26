@@ -880,7 +880,8 @@ function chgPath(elem) {
     sto = setTimeout(function() {
         var npath = elem.value;
         var lastchar = npath.substr(npath.length - 1)
-        if(lastchar == "/" || lastchar == "\\") {  
+        if(lastchar == "/" || lastchar == "\\" || lastchar == ":") {  
+            if(lastchar == ":") npath += "/";
             config.dir = npath;
             fileAccess();
             saveIni("aedit.ini.js")
