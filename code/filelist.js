@@ -452,12 +452,11 @@ function nodeClear(node)
 function deselectAll(parent)
 {
 	var child = parent.firstChild; // child of flist
-  //alert(parent + " " + parent.innerHTML);
 	while(child)
 	{
     if(child.className == 'entrybold')
 		{
-      child.className="file";  
+            child.className="file";  
 		}
 		child = child.nextSibling;
 	}  	  
@@ -547,7 +546,7 @@ function edit(element)
   parent.load()
   config.dir = extractDir(f)
   config.path = f;
-  saveIni("/code/aedit.ini.js")
+  saveIni("aedit.ini.js")
   parent.restartEditor()    
 }
 
@@ -568,7 +567,6 @@ function open(element, forcePage)
   var fpath = document.getElementById(fpathid);
   filepath = fpath.value;
   var fname =  getNameSelected(element);
-  //alert("open " + filepath + " " + fname);
   if(!isIExplorer)
     filepath = filepath.replace(/\\/gi, '/');
   var sep = '/';
@@ -782,21 +780,19 @@ function isDirectory(item)
 
 function getSelectedNames(source)
 {
-  var namelist = new Array();
-  var slist = getSelected(source);
-  //alert(slist);
+    var namelist = new Array();
+    var slist = getSelected(source);
 	for(i = 0; i < slist.length; i++)
 	{
-    var elem = slist[i].innerHTML;
-    var p = elem.indexOf('>');
-    elem = elem.slice(p+1);
-    p = elem.indexOf('<');
-    if(p > 0)
-      elem = elem.slice(0, p);
-    if(elem=='') continue;      
-    namelist.push(elem);
-  }
-  //alert("selection : " + namelist.join(' '));
+        var elem = slist[i].innerHTML;
+        var p = elem.indexOf('>');
+        elem = elem.slice(p+1);
+        p = elem.indexOf('<');
+        if(p > 0)
+            elem = elem.slice(0, p);
+        if(elem=='') continue;      
+        namelist.push(elem);
+    }
 	return namelist;    
 }
 
@@ -829,9 +825,7 @@ document.onkeydown=function(evt)
 {
   if(evt.shiftKey) isSHIFT = true;
               else isSHIFT = false;
-  //alert(document.activeElement);
   var code = (evt.keyCode || evt.which);
-  //alert("chooser " + code);
   switch(code)
   {  
       case 13:
@@ -848,13 +842,13 @@ document.onkeydown=function(evt)
   if(evt.ctrlKey)
   {
     isCTRL = true;
-    //alert("chooser " + code);    
+
     switch(code)
     {
       case 17: // ctrl key
         break;
 		  case 67:  // ctrl-c
-        //alert("ctrl-c");
+
         evt.preventDefault();
         evt.returnValue = false;
         passHandler(evt, code);
@@ -863,7 +857,6 @@ document.onkeydown=function(evt)
       case 73: // ctrl-i
         break;  
       case 85: // ctrl-u
-        //alert(code);
         evt.preventDefault();
         evt.returnValue = false;
         passHandler(evt, code);
@@ -885,11 +878,12 @@ var sto = null;
 function chgPath(elem) {
     if(sto != null) clearTimeout(sto);
     sto = setTimeout(function() {
-        var npath = document.getElementById(elem.id).value;
+        var npath = elem.value;
         var lastchar = npath.substr(npath.length - 1)
         if(lastchar == "/" || lastchar == "\\") {  
-            config.dir = extractDir(npath);
+            config.dir = npath;
             fileAccess();
+            saveIni("aedit.ini.js")
         }
     }, 1500);
 }
@@ -899,11 +893,11 @@ function alreadyInList(parent, name)
 	var child = parent.firstChild; // child of flist
 	while(child)
 	{
-    if(getNameSelected(child) == name)
-      return true;
+        if(getNameSelected(child) == name)
+            return true;
 		child = child.nextSibling;
 	}
-  return false;
+    return false;
 }
 
 function acceptRename(oldname, newname)
@@ -963,9 +957,9 @@ var elementRename = function(spanitem)
 
 	};
 
-  x.onkeydown = function(evt) {
-     evt.stopPropagation();
-  }
+    x.onkeydown = function(evt) {
+        evt.stopPropagation();
+    }
 
 	x.onblur = function(evt) {
 		spanitem.innerHTML = saved;

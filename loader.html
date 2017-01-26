@@ -7,7 +7,7 @@ License GPL 3.0
 <title>AEdit Loader</title>
 <link type="text/css" href="code/saver.css" rel="stylesheet">
 <script src="code/filelist.js" type="text/javascript"></script>
-<script src="code/aedit.ini.js"></script>
+<script src="aedit.ini.js"></script>
 <script src="code/javascript-ini.js"></script>
 </head>
 <body>
@@ -17,7 +17,7 @@ License GPL 3.0
 	    <div id="fspath" oncontextmenu="return false">
             <div id="pathlabel" style="color:#093">LOAD</div>
             <div id="pathcontrol">
-      	    <input type="text" class="innpath" id="lcontentpath" size="45" value="/">
+      	    <input type="text" class="innpath" id="lcontentpath" size="45" value="/" onkeyup="chgPath(this)">
             <input type="button" class="bpath button bgray" value="Cancel" onclick="cancel()"/>
             <input type="button" class="bpath bsave button bgreen" value="Edit" onclick="loadToEdit()"/>
             <input type="button" class="bpath bsave button bgreen" id="prjButton" style="display:none" value="Load" onclick="loadProject()"/>
@@ -27,7 +27,7 @@ License GPL 3.0
 
 <script>
 
-var socket = new WebSocket("ws://localhost:1034");
+var socket = new WebSocket("ws://localhost:1034");    
 
 function addKeyListEvents(target) {
   target=null; // nothing
@@ -36,7 +36,6 @@ function addKeyListEvents(target) {
 
 function setLoadPath() {
   SyncPath = document.getElementById("lcontentpath")  // SyncPath from FileList
-  //alert(config.dir + " " +config.path)
   parent.AEditSyncPath = SyncPath;
 }
 
@@ -55,7 +54,7 @@ function loadToEdit() {
   parent.load()
   config.dir = extractDir(f)
   config.path = f;
-  saveIni("/code/aedit.ini.js")
+  saveIni("aedit.ini.js")
   parent.restartEditor()
 }
 
@@ -70,7 +69,6 @@ socket.onmessage = function(event) {
   switch(jobj.type) {
     case 'dirdata':
           fileList(jobj, 0);
-          config.path = jobj.path;
         break;
     default:
         //alert(jobj.type)
@@ -93,7 +91,8 @@ function fileAccess()
 
 function startLoader()
 {
-  fileAccess();
+    fileAccess();
+    windows.alert=top.alert;
 }
 
 

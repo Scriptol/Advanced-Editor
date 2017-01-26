@@ -158,7 +158,6 @@ var nativeServer = net.createServer(function(ncom) {
 
 });
 
-//nativeServer.setTimeout(0);
 nativeServer.listen(1035, '127.0.0.1');
 
 // Create a websocket connection

@@ -7,7 +7,7 @@ License GPL 3.0
 <title>AE Creator</title>
 <link type="text/css" href="code/saver.css" rel="stylesheet">
 <script src="code/filelist.js" type="text/javascript"></script>
-<script src="code/aedit.ini.js"></script>
+<script src="aedit.ini.js"></script>
 <script src="code/javascript-ini.js"></script>
 </head>
 <body>
@@ -51,7 +51,7 @@ function createConfirmed() {
   parent.ProjectName  = f
   config.dir = extractDir(f)
   config.path = f;
-  saveIni("code/aedit.ini.js")
+  saveIni("aedit.ini.js")
   parent.createEnd();
   parent.restartEditor();  
 }
@@ -62,7 +62,6 @@ socket.onmessage = function(event) {
   switch(jobj.type) {
     case 'dirdata':
         fileList(jobj, 0);
-        config.path = jobj.path;
         break;
     default:
   }

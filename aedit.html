@@ -15,7 +15,7 @@ Make use of:
 <link type="text/css" href="code/aedit.css" rel="stylesheet">
 <script src="src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 <script src="code/javascript-ini.js"></script>    
-<script src="code/aedit.ini.js"></script>        
+<script src="aedit.ini.js"></script>        
 </head>
 <body>
 <div id="toolbar">
@@ -216,8 +216,8 @@ function saveDoc() {
 	var temp = editor.getValue();
 	if(temp.length > 0)
 	{
-        var sb = prompt("Save current content?", AEditFileName);
-        if(sb != null && sb != "") return save(false);
+        var sb = confirm("Save current content?");
+        if(sb === true) return save(false);
         return false; // abort
 	}    
     return true; // continue
@@ -383,7 +383,7 @@ function createEnd() {
 
     currentInProject=null;
     config.project = name;
-    saveIni("/code/aedit.ini.js")     
+    saveIni("aedit.ini.js")     
     updateTooltip();
     if(indexInProject(AEditFileName) != -1) {
         alert("Already included!");
@@ -478,7 +478,7 @@ function updateProjectName(name)
 {
     if(config.project != name) { 
       config.project = name;
-      saveFromAE('code/aedit.ini.js', config);
+      saveFromAE('aedit.ini.js', config);
     }
 }    
 
@@ -591,7 +591,7 @@ function quit() {
       if(saveDoc() === false) return;
   }    
   saveProject();    
-  saveFromAE('code/aedit.ini.js', config);
+  saveFromAE('aedit.ini.js', config);
   var a = { 'app' : 'explorer', 'params': { 'command': 'quit', }  };
   sendFromInterface(a);
   setTimeout(function() { socket.close(); this.close();}, 100);
@@ -618,13 +618,10 @@ function act(element)
             editor.blockOutdent();	
             break;					
 		case "link":
-			var temp = prompt("Enter a URL:", "http://");	
-            if(temp != null) {
 			var current = editor.session.getTextRange(editor.getSelectionRange());
-			temp = "<a href='" + temp + "'>" + current + "</a>";	
+			temp = "<a href=''>" + current + "</a>";	
 			editor.remove();
 			editor.insert(temp);	
-            }
 			break;
 		case "cut": 
 			editorMyClipboard = editor.getCopyText();
@@ -706,7 +703,7 @@ socket.onmessage = function(event) {
         if(data.project instanceof Object)  {  
             project = data.project; 
             config.project = project.name
-            saveIni("/code/aedit.ini.js")  
+            saveIni("aedit.ini.js")  
             addToProjects(project.name)
             updateTooltip();    
         }
@@ -855,14 +852,19 @@ function save(winflag)
 
 function buildtable(editor)
 {
-    var temp = prompt("Enter rows and cols: ");
-    var a = temp.split(" ");
-    var rows = parseInt(a[0]);
-    var cols = parseInt(a[1]);
+    var rows = 6;
+    var cols = 4;
     if(rows > 0 && cols > 0) 
 	{
 		var table = "<table><tbody>\n";
-		for (var i=0; i < rows; i++) 
+        table += "<thead><tr>";
+		for (var j=0; j < cols; j++) 
+		{
+            table += "<th></th>";
+		}
+		table += "</tr></thead>\n";
+        table += "<tbody>\n";
+		for (var i=1; i < rows; i++) 
 		{
 			table += "<tr>";
 			for (var j=0; j < cols; j++) 
