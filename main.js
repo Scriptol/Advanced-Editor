@@ -175,9 +175,7 @@ console.log("Starting Electron...")
 
 
 function createWindow () {
-  win = new BrowserWindow({width: 960, height: 600, "show":false
-    , "webPreferences" : { "nodeIntegration":false }  
-  });
+  win = new BrowserWindow({width: 1024, height: 600, "show":false });
   win.setMenu(null)
   
   process.resourcesPath = __dirname

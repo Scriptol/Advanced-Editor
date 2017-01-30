@@ -1,11 +1,10 @@
 # Advanced Editor
 
 Programming editor based on the Ace engine.
-Require Electron or Node.js and a browser, requires the WS module (included).
+Require Electron to run, requires the WS module (included).
 
-This source code editor is well-suited for switching frequently between several projects.
+This source code editor is designed for switching frequently between several projects. It is very easy to find and to load your scripts in many directories.
 
-It is very easy to customize thanks to the HTML CSS interface and is 
-guaranteed zero tracking. 
+Additionaly you can easily customize the editor thanks to the HTML + CSS interface and add function to the JavaScript code. 
 
 More infos on: http://www.scriptol.com/scripts/advanced-editor.php

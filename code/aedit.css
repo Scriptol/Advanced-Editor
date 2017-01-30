@@ -183,6 +183,7 @@
     left:0;
     width:100%;
     bottom:28px;
+    background:black;
 }
 
 
@@ -217,7 +218,6 @@
     box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.2), 4px 4px 8px rgba(168, 168, 168, 0.6);
     font-family: Calibri, Arial, serif;
 }
-
 
 .sideright {
   position:relative;

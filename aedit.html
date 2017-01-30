@@ -115,12 +115,14 @@ Make use of:
 </div> <!--main-->
     
 <script>
+const {dialog} = require('electron').remote    
     
 var contentToSave = false;
 var socket = new WebSocket("ws://localhost:1034");
 var editor = ace.edit("editor");
 var project = [];
 var root;
+var confirmDialog;
     
 var languageExt = {
   "c": "c_cpp",
@@ -212,13 +214,26 @@ function displayFileName() {
     fno.setAttribute("title", AEditFileName);
 }
 
+// Prompt to delete editor content    
+// or open a dialog to select a filename to save
+    
 function saveDoc() {
 	var temp = editor.getValue();
-	if(temp.length > 0)
-	{
-        var sb = confirm("Save current content?");
-        if(sb === true) return save(false);
-        return false; // abort
+	if(temp.length > 0)	{
+        if(confirm("Drop/Erase changes and continue?") == false) {
+            var fpath = dialog.showSaveDialog(null, {
+                title:"Save current file",
+                defaultPath: config.path,
+                buttonLavel: "Save file"
+            })
+            if(fpath != undefined && fpath.length > 0) {
+                AEditFileName = fpath;
+                save(false)
+                return true;
+            }
+            return false;
+        }
+        changedStatus(false);        
 	}    
     return true; // continue
 }
@@ -226,12 +241,12 @@ function saveDoc() {
 function newDoc()
 {
     if(contentToSave) {
-      var rep = saveDoc()
-      if(rep === false) return false; // abort
+      if(saveDoc() == false)
+        return false; // abort
     }     
     AEditFileName = "";
     updateStatusBar("");
-    return true;  // saved
+    return true;
 }
 
 
@@ -245,12 +260,13 @@ function clearDoc()
     return true;
 }
 
+
 var project = undefined;
 
 function display(data)
 {       
   editor.setTheme("ace/theme/" + config.theme.toLowerCase());  
-  var fontSize = parseInt(config.fonSize);
+  var fontSize = parseInt(config.fontSize);
   editor.setFontSize(fontSize);
   editor.setShowPrintMargin(false);
 
@@ -402,7 +418,7 @@ function createEnd() {
     } 
     addProject(name);
     addFileToCurrentProject();
- 
+    displayEditor();
 }    
     
 function createProject() {
@@ -891,7 +907,8 @@ function buildtable(editor)
 
 
 window.onload=function() {
-    lastPanel = document.getElementById("epanel");   
+    lastPanel = document.getElementById("epanel"); 
+    confirmDialog = document.getElementById("confirm");
     socket.onopen = function(event) {
         display(null);
         updateTooltip();
