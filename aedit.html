@@ -72,7 +72,7 @@ Make use of:
     <div id="project">
         <div id="prjbar">
             <img class="pimage" src="images/prjadd.png" title="Add file to current project" onclick="addFileToList()">
-            <img class="pimage" src="images/prjrem.png" title="Remove selected file from project"  onclick="removeFromPrj()">
+            <img class="pimage" src="images/prjrem.png" title="Remove selected file from project"  onclick="removeFileFromPrj()">
             <img class="primage" src="images/prjexit.png" title="Close the project" onclick="closeProject()">
         </div>
         <div id="prjlist"></div>
@@ -105,7 +105,7 @@ Make use of:
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 2.0</p>
+          <p>Version 2.1</p>
           <p>&copy; 2016-2017 Denis Sureau<br>www.scriptol.com<br></p>
           <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
@@ -122,7 +122,6 @@ var socket = new WebSocket("ws://localhost:1034");
 var editor = ace.edit("editor");
 var project = [];
 var root;
-var confirmDialog;
     
 var languageExt = {
   "c": "c_cpp",
@@ -224,7 +223,7 @@ function saveDoc() {
             var fpath = dialog.showSaveDialog(null, {
                 title:"Save current file",
                 defaultPath: config.path,
-                buttonLavel: "Save file"
+                buttonLabel: "Save file"
             })
             if(fpath != undefined && fpath.length > 0) {
                 AEditFileName = fpath;
@@ -403,34 +402,31 @@ function addFileToCurrentProject(name) {
     saveProject();       
 }
 
-function createEnd() {
-    var name = ProjectName;
-    if(name.lastIndexOf(".") == -1) {
-        name += ".prj";
-        ProjectName = name;
+    
+function createProject() {
+    if(project instanceof Object) return true;
+    var fpath = dialog.showSaveDialog(null, {
+        title:"Create new project",
+        defaultPath: config.dir,
+        buttonLabel: "Create project file"
+    })
+    if(fpath == undefined || fpath.length == 0) return false;
+    fpath = canonicalPath(fpath)
+    config.dir = extractDir(fpath)
+    config.path = fpath;
+    if(fpath.lastIndexOf(".") == -1) {
+        fpath += ".prj";
     }
-    updateProjectName(name); 
+    ProjectName = fpath;    
+    updateProjectName(fpath); 
     project = {};
-    project["name"]= name;
+    project["name"]= fpath;
     project["list"]= [];
     if(!(config.prjList instanceof Array)) {
         config["prjList"] = [];
     } 
-    addProject(name);
-    addFileToCurrentProject();
-    displayEditor();
-}    
-    
-function createProject() {
-    if(project instanceof Object) return 1;
-    root = extractDir(AEditFileName);
-    var fc=projectwindow("Project name", root);
-    if(fc==null || fc===false) {
-        alert("Not created.");
-        config.project="";
-        return 0;
-    }
-    return 2;
+    addProject(fpath);
+    return true;
 }    
    
 
@@ -473,7 +469,7 @@ function saveProject() {
     socket.send(JSON.stringify( { "type":"interface", "data": a }));  
 }
 
-function removeFromPrj() {
+function removeFileFromPrj() {
     var fname = currentInProject;
     var pos = indexInProject(fname);
     if(pos == -1) return;
@@ -491,7 +487,7 @@ function addFileToList() {
         return;
     }
 
-    if(createProject() == 1) {
+    if(createProject() == true) {
         addFileToCurrentProject(config.project);
     }
 }
@@ -501,7 +497,7 @@ function updateProjectName(name)
 {
     if(config.project != name) { 
       config.project = name;
-      saveFromAE('aedit.ini.js', config);
+      saveIni("aedit.ini.js")  
     }
 }    
 
@@ -514,25 +510,35 @@ function closeProject() {
     
 function selectProject(elem) {
     var pname = elem.getAttribute("title");
-    loadProject(pname);
+    loadProject(pname, true);
 }   
 
+function canonicalPath(s){
+    s = s.replace(/\\\\/g, '/');    
+    return s.replace(/\\/g, '/');
+}    
     
 function addProject(name) {
-    for(var i=0; i < config.prjList.length;i++) {
-        if(config.prjList[i] === name) {
-            return;
-        }
-    }  
+    if(config.prjList.indexOf(name) >= 0) {
+        return;
+    }
     config.prjList.push(name);
     config.prjList.sort(function (a, b) {
-      var af = extractFile(a);
-      var bf = extractFile(b);
-      return af.localeCompare(bf);
+        var af = extractFile(a);
+        var bf = extractFile(b);
+        return af.localeCompare(bf);
     } );    
+} 
+    
+function removeProject(name)  {
+    var index = config.prjList.indexOf(name);
+    if (index > -1) {
+        config.prjList.splice(index, 1);
+        updateTooltip();
+        saveIni("aedit.ini.js")  
+    }   
 }  
     
-/* end of project */    
     
 function setIna(elem) {
     elem.setAttribute("class", "prjIna");
@@ -579,7 +585,7 @@ function prjCtxMenu(elem)
   p.onclick=function() {
       var temp = currentInProject  
       currentInProject = elem.title
-      removeFromPrj() 
+      removeFileFromPrj() 
       currentInProject = temp
       projectDisplay()
   };
@@ -618,7 +624,7 @@ function quit() {
       if(saveDoc() === false) return;
   }    
   saveProject();    
-  saveFromAE('aedit.ini.js', config);
+  saveIni("aedit.ini.js")  
   var a = { 'app' : 'explorer', 'params': { 'command': 'quit', }  };
   sendFromInterface(a);
   setTimeout(function() { socket.close(); this.close();}, 100);
@@ -718,6 +724,32 @@ function changedStatus(status)
     contentToSave = status;  
 }
 
+function socketConfirm(jobj) {
+	var answer = confirm(jobj.question);
+    var data = jobj.data;
+    switch(data.command) {
+        case "delprj":
+        removeProject(data.path);
+        break;
+    case "unlink":        
+    //case "copyover":
+        if(answer===true) {
+            var a = { 'app' : 'explorer', 'params': data };
+            sendFromInterface(a);
+        }            
+        break;
+    case "createdir":
+        if(answer===true) {
+            var a = { 'app' : 'explorer',
+		      'params': { 'command': 'mkdir', 'path': data.path, 'target':data.target }
+            };
+            sendFromInterface(a);
+        };
+        break;
+    default:
+        break;   
+  }
+}    
   
     
 socket.onmessage = function(event) {
@@ -762,6 +794,9 @@ socket.onmessage = function(event) {
             alert(data.message);
         }  
         break;
+    case 'confirm':
+        socketConfirm(data);
+        break;             
     case "message":    
     case "mouse":
         break;  
@@ -834,9 +869,12 @@ function load()
     socket.send(JSON.stringify( { "type":"interface", "data": a }));  
 }  
     
-function loadProject(name)
-{   
-    var a = { 'app' : 'explorer', 'params': { 'command': 'openPrj', 'name': name } };
+function loadProject(name, mode) {   
+    var a = { 'app' : 'explorer', 'params': { 
+        'command': 'openPrj', 
+        'name': name, 
+        'mode': mode 
+    } };
     socket.send(JSON.stringify( { "type":"interface", "data": a }));  
 }    
     
@@ -908,12 +946,11 @@ function buildtable(editor)
 
 window.onload=function() {
     lastPanel = document.getElementById("epanel"); 
-    confirmDialog = document.getElementById("confirm");
     socket.onopen = function(event) {
         display(null);
         updateTooltip();
         var pname = config.project;
-        loadProject(pname);
+        loadProject(pname, false);
     }
 }
     
