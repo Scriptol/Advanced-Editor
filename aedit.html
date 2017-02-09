@@ -52,6 +52,8 @@ Make use of:
         <img class="image" src="images/insert.png" alt="Insert elements" title="Insert elements">
    <span>
   <h3>INSERT</h3>
+    <p id="comment" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>/* */</p>  
+    <p id="nocomment" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>No /* */</p>         
     <p id="link" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Link</p>   
     <p id="table" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Table</p>         
    </span>    
@@ -97,15 +99,12 @@ Make use of:
     <div id="spanel">
             <iframe id="saver" src="saver.html" width="640" height="500"></iframe>
     </div>
-    <div id="cpanel">
-            <iframe id="creator" src="creator.html" width="640" height="500"></iframe>
-    </div>
     <div id="opanel">
             <iframe id="options" src="settings.html" width="640" height="500"></iframe>
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 2.1</p>
+          <p>Version 2.2</p>
           <p>&copy; 2016-2017 Denis Sureau<br>www.scriptol.com<br></p>
           <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
@@ -370,18 +369,6 @@ function indexInProject(fname)  {
     
 var currentInProject = null;    
 
-function projectwindow(label, dflt) {    
-    var cpanel = document.getElementById("cpanel")
-    var creator = document.getElementById("creator")
-    var fc = (creator.contentWindow || creator.contentDocument);
-    lastPanel.style.display="none"    
-    cpanel.style.display="block"
-    lastPanel = cpanel
-    fc.startCreator() 
-    fc.setCreatePath(); 
-    return fc;     
-}
-
 function addFileToCurrentProject(name) {    
     currentInProject=null;
     config.project = name;
@@ -510,7 +497,7 @@ function closeProject() {
     
 function selectProject(elem) {
     var pname = elem.getAttribute("title");
-    loadProject(pname, true);
+    openProject(pname, true);
 }   
 
 function canonicalPath(s){
@@ -650,12 +637,6 @@ function act(element)
 		case "outdent":		
             editor.blockOutdent();	
             break;					
-		case "link":
-			var current = editor.session.getTextRange(editor.getSelectionRange());
-			temp = "<a href=''>" + current + "</a>";	
-			editor.remove();
-			editor.insert(temp);	
-			break;
 		case "cut": 
 			editorMyClipboard = editor.getCopyText();
 			editor.remove(); 
@@ -686,7 +667,26 @@ function act(element)
             break;  
         case "bottom":
             editor.gotoLine(99990,0)
-            break;                
+            break; 
+		case "comment":
+			var current = editor.session.getTextRange(editor.getSelectionRange());
+			temp = "/*" + current + "*/";	
+			editor.remove();
+			editor.insert(temp);	
+			break;  
+        case "nocomment":
+            var xy = editor.getCursorPosition()
+            editor.find("*/", {start: xy})
+            editor.replace("")
+            editor.find("/*", {start: xy, backwards:true})
+            editor.replace("")
+            break;
+		case "link":
+			var current = editor.session.getTextRange(editor.getSelectionRange());
+			temp = "<a href=''>" + current + "</a>";	
+			editor.remove();
+			editor.insert(temp);	
+			break;            
 		case "table":
 			buildtable(editor);
 			break;
@@ -766,7 +766,6 @@ socket.onmessage = function(event) {
             addProject(project.name)
             updateTooltip();    
         }
-            
         AEditFileName = data.filename;
         displayFileName();
         if(data.content.length > 127) {
@@ -785,6 +784,14 @@ socket.onmessage = function(event) {
         changedStatus(false);
         editor.focus();
         break
+    case "openPrj":    
+        project = data.project; 
+        config.project = project.name
+        saveIni("aedit.ini.js")  
+        addProject(project.name)
+        updateTooltip(); 
+        projectDisplay();     
+        break;    
     case "editor":
         if(data.action == "prompt") {
 		    var p = prompt(data.message);
@@ -863,13 +870,14 @@ function load()
 {
     var a = { 'app' : 'explorer', 'params': { 
 	            'command': 'getContent', 
-				'path': AEditFileName, 
+				'path': AEditFileName,
+                'project':"",
                 'target' : null
 				}};
     socket.send(JSON.stringify( { "type":"interface", "data": a }));  
 }  
     
-function loadProject(name, mode) {   
+function openProject(name, mode) {   
     var a = { 'app' : 'explorer', 'params': { 
         'command': 'openPrj', 
         'name': name, 
@@ -950,7 +958,7 @@ window.onload=function() {
         display(null);
         updateTooltip();
         var pname = config.project;
-        loadProject(pname, false);
+        openProject(pname, false);
     }
 }
     
