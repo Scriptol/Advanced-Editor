@@ -28,7 +28,7 @@ Make use of:
 <div class="imagebutton" id="go">
     <div class="insert">
         <img class="image" src="images/go.png" alt="Go to location" title="Go to location">
-   <span id="golist">
+   <span id="golist" class="comlist">
   <h3>Go to...</h3>
     <p id="top" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Top</p>   
     <p id="bottom" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Bottom</p>
@@ -42,24 +42,34 @@ Make use of:
 
 <div class="imagebutton" id="outdent" onClick="act(this)"><img class="image" src="images/outdent.png" alt="Outdent" title="Unindent  SHIFT-TAB"></div>
 <div class="imagebutton" id="indent"  onClick="act(this)"><img class="image" src="images/indent.png" alt="Indent" title="Indent  TAB"></div>
-<div class="imagebutton" id="cut"     onClick="act(this)"><img class="image" src="images/cut.png" alt="Cut" title="Cut  CTRL-X"></div>
-<div class="imagebutton" id="copy"    onClick="act(this)"><img class="image" src="images/copy.png" alt="Copy" title="Copy  CTRL-C"></div>
-<div class="imagebutton" id="paste"   onClick="act(this)"><img class="image" src="images/paste.png" alt="Paste" title="Paste  CTRL-V"></div>
+
+<div class="imagebutton" id="cutico">
+ <div class="insert">
+  <img class="image" src="images/cut.png" alt="Cut/paste" title="Copy/Paste">
+  <span class="comlist">
+  <h3>Copy/Paste</h3>
+  <p id="cut" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Cut  <span class="shortcut">CTRL-X</span></p>   
+  <p id="copy" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Copy  <span class="shortcut">CTRL-C</span></p> 
+  <p id="paste" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Paste  <span class="shortcut">CTRL-V</span></p> 
+  </span>
+ </div>
+</div>    
+    
 <div class="imagebutton" id="undo"    onClick="act(this)"><img class="image" src="images/undo.png" alt="Undo" title="Undo  CTRL-Z"></div>
 <div class="imagebutton" id="redo"    onClick="act(this)"><img class="image" src="images/redo.png" alt="Redo" title="Redo   CTRL-Y"></div>
 <div class="imagebutton" id="insico">
-    <div class="insert">
-        <img class="image" src="images/insert.png" alt="Insert elements" title="Insert elements">
-   <span>
-  <h3>INSERT</h3>
-    <p id="comment" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>/* */</p>  
-    <p id="nocomment" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>No /* */</p>         
-    <p id="link" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Link</p>   
-    <p id="table" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Table</p>         
-   </span>    
-  </div>  
+ <div class="insert">
+   <img class="image" src="images/insert.png" alt="Insert elements" title="Insert elements">
+  <span class="comlist">
+  <h3>Insert</h3>
+  <p id="comment" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>/* */</p>  
+  <p id="nocomment" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>No /* */</p>         
+  <p id="link" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Link</p>   
+  <p id="table" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Table</p>         
+ </span>    
+ </div>  
 </div>    
-    <div class="imagebutton" id="about" onClick="act(this)">
+<div class="imagebutton" id="about" onClick="act(this)">
   <img src="images/help.png" id='thelp' width="32" height="32" title="About AEdit">
 </div>
 <div class="imagebutton" id='quit'   onClick="act(this)"><img class="image" src="images/exit.png" alt="Exit" title="Close the editor"></div>
@@ -104,7 +114,7 @@ Make use of:
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 2.2</p>
+          <p>Version 2.3</p>
           <p>&copy; 2016-2017 Denis Sureau<br>www.scriptol.com<br></p>
           <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
@@ -212,20 +222,19 @@ function displayFileName() {
     fno.setAttribute("title", AEditFileName);
 }
 
-// Prompt to delete editor content    
+// Prompt to discard content changes
 // or open a dialog to select a filename to save
     
 function saveDoc() {
 	var temp = editor.getValue();
 	if(temp.length > 0)	{
-        if(confirm("Drop/Erase changes and continue?") == false) {
+        if(confirm("Discard/Ignore the changes and continue?") == false) {
             var fpath = dialog.showSaveDialog(null, {
-                title:"Save current file",
+                title:"Save current text",
                 defaultPath: config.path,
-                buttonLabel: "Save file"
+                buttonLabel: "Save file and continue"
             })
             if(fpath != undefined && fpath.length > 0) {
-                AEditFileName = fpath;
                 save(false)
                 return true;
             }
@@ -758,7 +767,7 @@ socket.onmessage = function(event) {
     {
     case "openDoc":
         setActiveRow();
-        if(clearDoc() == false) break;   // save aborted         
+        if(clearDoc() == false) break;   // save aborted  
         if(data.project instanceof Object)  {  
             project = data.project; 
             config.project = project.name
@@ -766,14 +775,19 @@ socket.onmessage = function(event) {
             addProject(project.name)
             updateTooltip();    
         }
-        AEditFileName = data.filename;
-        displayFileName();
         if(data.content.length > 127) {
           editor.session.setValue(data.content.slice(9), -1);
         }
         else {
 		  editor.session.setValue(data.content, -1);
         }
+        AEditFileName = data.filename;
+        if(project instanceof Object) {
+            if(indexInProject(AEditFileName) != -1) {
+                config.active = AEditFileName;
+            }
+        }   
+        displayFileName();
         var mode = "plain_text";
         if(data.ext in languageExt)   
             mode = "ace/mode/" + languageExt[data.ext];

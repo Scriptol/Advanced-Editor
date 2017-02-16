@@ -209,13 +209,11 @@
     height:20px;
     line-height:18px;
     color:black;
-    background:white;
     margin:2px;
     padding:2px 8px 2px 8px;
     border-radius:4px;
     overflow:hidden;
     box-sizing: border-box;  
-    box-shadow: inset 2px 2px 2px rgba(0, 0, 0, 0.2), 4px 4px 8px rgba(168, 168, 168, 0.6);
     font-family: Calibri, Arial, serif;
 }
 
@@ -276,7 +274,7 @@
 }
 
 
-.insert span
+.insert .comlist
 {
     display:none;
     color:black;
@@ -289,7 +287,7 @@
     margin:6px 2px 2px 8px;
 }
 
-.insert:hover span
+.insert:hover .comlist
 {
   display:block;
   position:absolute;
@@ -317,7 +315,10 @@
     border-bottom:1px solid #ccc;
 }
 
-
+.insert p .shortcut {
+    float:right;
+    padding-right:8px;
+}
 
 /* Project tooltip */
 

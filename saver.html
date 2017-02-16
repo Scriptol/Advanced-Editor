@@ -15,7 +15,7 @@ License GPL 3.0
 <div id="main">
     <div id="scontent"></div>
 	  <div id="fspath" oncontextmenu="return false">
-        <div id="pathlabel"> SAVE TO </div>
+        <div id="pathlabel" style="color:#06C"> SAVE TO </div>
         <div id="pathcontrol">
       	  <input type="text" class="innpath" id="scontentpath" size="40" value="/" onkeyup="chgPath(this)">
           <input type="button" class="bpath button bgray" value="Cancel" onclick="cancel()"/>
@@ -60,18 +60,11 @@ function saveConfirmed() {
 socket.onmessage = function(event) {
   var jobj =   JSON.parse(event.data);
   switch(jobj.type) {
-    case 'notification':
-        //saverNotification(jobj);
-        break;
-    case 'confirm':
-        //saverConfirm(jobj);
-        break;
     case 'dirdata':
         fileList(jobj, 0);
         config.path = jobj.path;
         break;
     default:
-        //alert(jobj.type)
   }
 };
 
