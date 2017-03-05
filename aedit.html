@@ -69,6 +69,9 @@ Make use of:
  </span>    
  </div>  
 </div>    
+<div class="imagebutton" id="preview" onClick="act(this)">
+  <img src="images/preview.png" width="32" height="32" title="Preview document">
+</div>    
 <div class="imagebutton" id="about" onClick="act(this)">
   <img src="images/help.png" id='thelp' width="32" height="32" title="About AEdit">
 </div>
@@ -114,7 +117,7 @@ Make use of:
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 2.3</p>
+          <p>Version 2.4</p>
           <p>&copy; 2016-2017 Denis Sureau<br>www.scriptol.com<br></p>
           <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
@@ -231,22 +234,22 @@ function saveDoc() {
         if(confirm("Discard/Ignore the changes and continue?") == false) {
             var fpath = dialog.showSaveDialog(null, {
                 title:"Save current text",
-                defaultPath: config.path,
+                defaultPath: AEditFileName,
                 buttonLabel: "Save file and continue"
             })
             if(fpath != undefined && fpath.length > 0) {
-                save(false)
+                AEditFileName = fpath;
+                save(false);
                 return true;
             }
-            return false;
+            return false;  // abort
         }
         changedStatus(false);        
 	}    
-    return true; // continue
+    return true; // continue with new doc
 }
     
-function newDoc()
-{
+function newDoc() {
     if(contentToSave) {
       if(saveDoc() == false)
         return false; // abort
@@ -257,8 +260,7 @@ function newDoc()
 }
 
 
-function clearDoc()
-{
+function clearDoc() {
     if(newDoc() == false) return false; 
     displayFileName();     
     editor.session.setValue("");
@@ -320,24 +322,20 @@ function getSource(filepath){
     );
 }
 
-function getActiveRow() 
-{
+function getActiveRow() {
     if(project==null) return;
-    for(var i = 0; i < project.list.length; i++)
-    {
+    for(var i = 0; i < project.list.length; i++) {
         if(AEditFileName == project.list[i][0])  
             return project.list[i][1];
     }
     return 0;
 }
 
-function setActiveRow() 
-{     
+function setActiveRow() {     
     if(AEditFileName == undefined || AEditFileName == "") return;
     if(!(project instanceof Object)) return;
     if("list" in project) {
-        for(var i = 0; i < project.list.length; i++)
-        {
+        for(var i = 0; i < project.list.length; i++)  {
             if(AEditFileName == project.list[i][0]) {
                 project.list[i][1] = editor.getFirstVisibleRow();
                 return;
@@ -477,20 +475,17 @@ function removeFileFromPrj() {
 
 
 function addFileToList() {
-    
     if(AEditFileName == undefined || AEditFileName == "") {
         alert("Save the file before to add to a project.")
         return;
     }
-
     if(createProject() == true) {
         addFileToCurrentProject(config.project);
     }
 }
     
     
-function updateProjectName(name)
-{
+function updateProjectName(name) {
     if(config.project != name) { 
       config.project = name;
       saveIni("aedit.ini.js")  
@@ -554,8 +549,7 @@ function updateTooltip() {
     }
 }
 
-function prjCtxMenu(elem)
-{
+function prjCtxMenu(elem) {
   var x = document.getElementById('ctx1');
   if(x) x.parentNode.removeChild(x); 
   
@@ -593,6 +587,20 @@ function prjCtxMenu(elem)
 
 /* Project end */
    
+    
+function preview(openflag) {
+  var a = {  'app': 'explorer', 'params' : {
+        'command': 'viewtext',
+        'path': AEditFileName, 
+        'target': null,
+        'open': openflag,
+        'ext': ''
+  }};
+  socket.send(
+        JSON.stringify( { "type":"interface", "data": a })
+  );
+}    
+    
 function manual() {
     var ifr=document.createElement("iframe")
     var ap=document.getElementById("apanel")
@@ -628,8 +636,7 @@ function quit() {
 
 /* Shell */
 
-function act(element)
-{
+function act(element) {
 	var command = element.id;
 	var temp;
 	switch(command)
@@ -705,6 +712,9 @@ function act(element)
 		case "redo":
 			editor.redo();
 			break;	
+        case "preview":
+            preview(true);
+            break;
         case "about":
             about()
             break;
@@ -917,9 +927,7 @@ function option() {
     lastPanel = opanel
 }
 
-function save(winflag)
-{
-    //alert("save " + pflag + " " + AEditFileName)
+function save(winflag) {
     var nflag = AEditFileName == undefined || AEditFileName == "";
     if(winflag || nflag)  { 
         return winsave() 
@@ -928,34 +936,33 @@ function save(winflag)
     setActiveRow();
     var content = editor.getValue();
     if(content.length == 0) return; 
-    var a = { 'app' : 'explorer', 'params': { 
-	            'command': 'save', 
-				'filename': AEditFileName, 
-				'content' : content,
-				'overwrite' : true 
-	}};
-    socket.send(JSON.stringify( { "type":"interface", "data": a }));  
+    var a = { 
+        'app' : 'explorer', 
+        'params': { 
+	        'command': 'save', 
+			'filename': AEditFileName, 
+			'content' : content,
+			'overwrite' : true 
+	   }
+    };
+    socket.send(JSON.stringify( { "type":"interface", "data": a }));
+    preview(false)
 }
 
-function buildtable(editor)
-{
+function buildtable(editor) {
     var rows = 6;
     var cols = 4;
-    if(rows > 0 && cols > 0) 
-	{
+    if(rows > 0 && cols > 0) {
 		var table = "<table><tbody>\n";
         table += "<thead><tr>";
-		for (var j=0; j < cols; j++) 
-		{
+		for (var j=0; j < cols; j++) {
             table += "<th></th>";
 		}
 		table += "</tr></thead>\n";
         table += "<tbody>\n";
-		for (var i=1; i < rows; i++) 
-		{
+		for (var i=1; i < rows; i++) {
 			table += "<tr>";
-			for (var j=0; j < cols; j++) 
-			{
+			for (var j=0; j < cols; j++) {
 				table += "<td></td>";
 			}
 			table += "</tr>\n";
