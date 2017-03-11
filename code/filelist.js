@@ -134,6 +134,9 @@ function buildLink(filepath, fname, panelid, timesize, filedate, ext)
     case 'prj':
           balise += 'images/prj.png';
           break;
+    case 'md':
+          balise += 'images/md.png';
+          break;            
     case 'steps':
           balise += 'images/steps.png';
           break;   
