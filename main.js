@@ -177,6 +177,7 @@ console.log("Starting Electron...")
 function createWindow () {
   win = new BrowserWindow({width: 1060, height: 600, "show":false });
   win.setMenu(null)
+  //win.webContents.openDevTools()
   
   process.resourcesPath = __dirname
   console.log("Working directory : " + process.resourcesPath)
@@ -188,9 +189,6 @@ function createWindow () {
   }))
 
   win.show()
-  
-  //win.webContents.openDevTools()
-  
   win.on('closed', () => {
     win = null
   })

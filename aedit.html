@@ -44,7 +44,7 @@ Make use of:
 <div class="imagebutton" id="indent"  onClick="act(this)"><img class="image" src="images/indent.png" alt="Indent" title="Indent  TAB"></div>
 
 <div class="imagebutton" id="cutico">
- <div class="insert">
+<div class="insert">
   <img class="image" src="images/cut.png" alt="Cut/paste" title="Copy/Paste">
   <span class="comlist">
   <h3>Copy/Paste</h3>
@@ -117,7 +117,7 @@ Make use of:
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 2.4</p>
+          <p>Version 2.5</p>
           <p>&copy; 2016-2017 Denis Sureau<br>www.scriptol.com<br></p>
           <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
@@ -171,7 +171,9 @@ editor.getSession().on('change', function() {
 editor.commands.addCommand({
     	name: 'saving',
     	bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
-    	exec: function(editor) { save(false); }
+    	exec: function(editor) { 
+            save(false); 
+        }
 	},{
     name: "find",
     bindKey: {win: "Ctrl-F", mac: "Command-F"},
@@ -227,6 +229,35 @@ function displayFileName() {
 
 // Prompt to discard content changes
 // or open a dialog to select a filename to save
+    
+/*
+function saveDoc() {
+	var temp = editor.getValue();
+	if(temp.length > 0)	{
+        dialog.showMessageBox(top, { 
+            "icon": "images/save.png",
+            "buttons":["Do not save", "Save", "Cancel"],
+            "message": "File not saved. Save it before to continue?"
+        }, function(response) {
+            if(response == 2) return false; // cancel
+            if(response == 1)  {
+                var fpath = dialog.showSaveDialog(null, {
+                    title:"Save current text",
+                    defaultPath: AEditFileName,
+                    buttonLabel: "Save file and continue"
+                })
+                if(fpath != undefined && fpath.length > 0) {
+                    AEditFileName = fpath;
+                    save(false);
+                    return true;
+                }
+                changedStatus(false); // do not save      
+            }   
+     })
+    }
+    return true; // continue with new doc
+}
+*/
     
 function saveDoc() {
 	var temp = editor.getValue();
@@ -636,6 +667,7 @@ function quit() {
 
 /* Shell */
 
+var origin;
 function act(element) {
 	var command = element.id;
 	var temp;
@@ -666,7 +698,8 @@ function act(element) {
 		case "set":
 		case "clear":
 			break;
-		case "save":	
+		case "save":
+            origin = AEditFileName;
 			save(true);
 			break;
 		case "find":
@@ -927,6 +960,14 @@ function option() {
     lastPanel = opanel
 }
 
+function getExtension(fname) {
+    if(fname != undefined && fname != "") {
+        var pos = fname.lastIndexOf(".")
+        if(pos > 0) return fname.substr(pos)
+    }
+    return ""
+}    
+    
 function save(winflag) {
     var nflag = AEditFileName == undefined || AEditFileName == "";
     if(winflag || nflag)  { 
@@ -934,6 +975,13 @@ function save(winflag) {
     }
     editor.focus();
     setActiveRow();
+    let convert = false
+    if(getExtension(origin)== ".md") {
+        var tgtext = getExtension(AEditFileName)
+        if(tgtext == ".html" || tgtext == ".xml" || tgtext == ".php") {
+            convert = true  
+        }
+    }
     var content = editor.getValue();
     if(content.length == 0) return; 
     var a = { 
@@ -942,12 +990,19 @@ function save(winflag) {
 	        'command': 'save', 
 			'filename': AEditFileName, 
 			'content' : content,
+            'convert' : convert,
+            'origin'  : origin,
 			'overwrite' : true 
 	   }
     };
     socket.send(JSON.stringify( { "type":"interface", "data": a }));
     preview(false)
-}
+    if(convert && origin != "") {
+        AEditFileName = origin;
+        origin = "";
+    }
+}   
+    
 
 function buildtable(editor) {
     var rows = 6;
