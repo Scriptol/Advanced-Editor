@@ -175,7 +175,12 @@ console.log("Starting Electron...")
 
 
 function createWindow () {
-  win = new BrowserWindow({width: 1060, height: 600, "show":false });
+  win = new BrowserWindow({ 
+      'width': 1060, 
+      'height': 680, 
+      'show':false,
+      'backgroundColor': '#000'
+  });
   win.setMenu(null)
   //win.webContents.openDevTools()
   

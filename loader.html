@@ -65,11 +65,11 @@ function loadProject() {
 }
 
 socket.onmessage = function(event) {
-  var jobj =   JSON.parse(event.data);
+  var jobj = JSON.parse(event.data);
   switch(jobj.type) {
     case 'dirdata':
           fileList(jobj, 0);
-        break;
+          break;
     default:
         //alert(jobj.type)
   }

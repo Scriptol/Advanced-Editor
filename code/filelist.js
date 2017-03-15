@@ -232,7 +232,6 @@ function fileList(content, sortMode)
 	var extmask = content.extmask; 
 	var filepath = content.path;
 	var fpathid = target + "path";
-  //alert(filepath + " " + fpathid)
 	var fpath = document.getElementById(fpathid);
 	fpath.value = filepath;
   
@@ -265,7 +264,7 @@ function fileList(content, sortMode)
 		else
 		{
 			var timesize = item[2];
-      var filedate = item[3];    
+            var filedate = item[3];    
 			var p = name.lastIndexOf('.');
 			var ext = name.slice(p + 1);
 			if(extmask && ext != extmask) continue; 
@@ -278,8 +277,6 @@ function fileList(content, sortMode)
 	page += "</div>";
 	page += "</div>";
 	d.innerHTML = page;
-
-	//addKeyListEvents(target);
 
 	if(elementToSelect != null)
 	{

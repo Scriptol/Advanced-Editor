@@ -6,7 +6,7 @@
 	margin:0;
 	padding:0;
 	overflow: hidden;
-    background: #ccc;
+    background:black;
 }
 
 
@@ -19,7 +19,6 @@
 	height: 36px; 
 	background: url("../images/back.png");
 	border:1px solid #CCC;
-	border-radius:4px;
 	padding:4px 8px 0px 8px;
     margin:0 0 8px 0;
 }
@@ -63,7 +62,7 @@
 
 #main {
 	position: absolute;
-	top: 44px;
+	top: 42px;
 	right: 0;
 	bottom: 0;
 	left: 0;
@@ -81,8 +80,9 @@
 	width:200px;
 	height:100%;
 	overflow:hidden;
-	border-right:1px solid #ccc;
+	border-right:1px solid #888;
 	display:block;
+    background:black;
 }
 
 #prjbar {
@@ -94,7 +94,7 @@
 	padding:4px;
 	margin:0;
 	overflow:hidden;
-	background: url("../images/prjback.png");
+	background: url("../images/darkbar.png");
 	padding:4px 4px 0px 4px;
 }
 
@@ -110,7 +110,6 @@
 	background:black;
     color:white;
 	overflow:hidden;
-	border-top:1px solid #ccc;
 }
 
 #prjlist p {
@@ -125,9 +124,11 @@
     position:absolute;
     bottom:0;
     left:0;
-    width:196px;
-    height:28px;
-    background: url("../images/prjback.png");
+    right:0;
+    width:200px;
+    height:27px;
+    background: url("../images/darkbar.png");
+    border-top:1px solid #888;
 }
 
 #currprj {
@@ -195,6 +196,8 @@
     bottom:0;    
     height:28px;
     background: url("../images/prjback.png");
+    background: #333;
+    border-top:1px solid #666;
     padding:2px;
     margin-top:-32px;
     box-sizing: border-box;
@@ -208,13 +211,14 @@
     right:4px;
     height:20px;
     line-height:18px;
-    color:black;
+    color:#999;
     margin:2px;
-    padding:2px 8px 2px 8px;
+    padding:0px 8px 2px 8px;
     border-radius:4px;
     overflow:hidden;
     box-sizing: border-box;  
-    font-family: Calibri, Arial, serif;
+    font-size:12px;
+    font-family: Arial;
 }
 
 .sideright {

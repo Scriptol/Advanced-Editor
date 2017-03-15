@@ -63,7 +63,8 @@ socket.onmessage = function(event) {
     case 'dirdata':
         fileList(jobj, 0);
         config.path = jobj.path;
-        document.getElementById("scontentpath").value = parent.AEditFileName
+        var filename = parent.document.getElementById("filename").innerHTML;
+        document.getElementById("scontentpath").value += "/" + filename
         break;
     default:
   }
