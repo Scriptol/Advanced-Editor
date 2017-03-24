@@ -12,48 +12,32 @@
    - The explorer.js module.
 */
 
+const {ipcRenderer} = top.require('electron')        
 
 var currentpath = [];
 var insidezip = [];
 var elementToSelect = null;
 var elementToOffset = null;
 var ChooserDrag = null;
-
 var customview = [];
-
-var socket = new WebSocket("ws://localhost:1034");
 
 // event
 
-socket.onmessage=function(e) {
-     var jobj = JSON.parse(e.data);
-     switch(jobj.type) {
+/*
+ipcRenderer.on("filelist", (event, data) => {
+    var jobj = JSON.parse(data);
+    switch(jobj.type) {
       case 'dirinfo':  break;
       default:
-        alert(jobj.data);      
+        alert("File manager: Unknow command " + jobj.type);      
      }
-}
-
+});
+*/
 
 function sendFromInterface(a) {
-  socket.send(
-    JSON.stringify( { "type":"interface", "data": a })
-  );
+    ipcRenderer.send("interface", JSON.stringify(a));
 }
 
-function fileButton(target, dragflag)
-{
-	var filepath = currentpath[target];  // to do : be persistent
-	var query = { 
-    'app' : 'explorer', 
-    'params': { 
-        'path' : filepath, 
-        'command': 'getdir', 
-        'target': target 
-        } 
-  };
-  sendFromInterface(query);
-}
 
 function pathJoin(path, filename)
 {
@@ -321,23 +305,20 @@ function setDrag(id)
 function chDir(filepath, target)
 {    
 	if(filepath.slice(0, 8) == "file:///")
-		filepath = filepath.slice(8);
-  //alert("chDir " + filepath + " " + target) 
-	var a = {  'app': 'explorer', 
-             'params' : { 
-                   'file': 'code/filelist.js', 
-                   'command': 'chdir', 
-                   'path': filepath,
-                   'target': target 
-                  }
-          };
-  sendFromInterface(a);
+	filepath = filepath.slice(8);
+  	var a = {
+        'file': 'code/filelist.js', 
+        'command': 'chdir', 
+        'path': filepath,
+        'target': target 
+    };
+    sendFromInterface(a);
 }
 
 function unlocalize(filepath)
 {
  	if(filepath.slice(0, 8) == "file:///") return(filepath.slice(8));
-  return(filepath);    
+    return(filepath);    
 }      
 
 function noHTMLchars(s){
@@ -354,12 +335,11 @@ function view(element, filepath, panelid, forcePage)
   {
     var filename = getNameSelected(element);
     var archive = document.getElementById(panelid +'path').value; 
-    var a = {  'app': 'explorer', 'params' : { 
+    var a = {  
          'command': 'textinzip',
          'archive': archive,
          'entryname': filename
-         }
-      };
+     };
     sendFromInterface(a);    
     return;
   }   
@@ -390,19 +370,19 @@ function view(element, filepath, panelid, forcePage)
     case 'png':
     case 'jpg':
     case 'jpeg':  
-      var a = {  'app': 'explorer', 'params' : { 
-        'command': 'loadimage', 'path': filepath, 'target': panelid } };
+      var a = { 
+        'command': 'loadimage', 'path': filepath, 'target': panelid  };
         sendFromInterface(a);
       break;
     case 'zip':
-        var a = {  'app': 'explorer', 'params' : { 
-         'command': 'viewzip', 'path': filepath, 'target': panelid } };
+        var a = { 
+         'command': 'viewzip', 'path': filepath, 'target': panelid };
         sendFromInterface(a);
       break;
     case 'exe':
     case 'jar':
-      var a = {  'app': 'explorer', 'params' : { 
-         'command': 'execute', 'filename': null, 'path': filepath,'target': panelid } };
+      var a = {  
+         'command': 'execute', 'filename': null, 'path': filepath,'target': panelid };
       sendFromInterface(a);
       break;
     case 'prj':
@@ -431,8 +411,7 @@ function view(element, filepath, panelid, forcePage)
     default:
      	if(filepath.slice(0, 5) != 'http:')
 	     filepath = "file:///" + filepath;
-      var a = {  'app': 'explorer', 'params' : { 
-        'command': 'viewtext', 'path': filepath, 'target': panelid  } };
+      var a = { 'command': 'viewtext', 'path': filepath, 'target': panelid };
       sendFromInterface(a);
       break;    
   }  
@@ -659,9 +638,7 @@ function dirinfo(element)
 {
   var target = pointFile(element);
   var fname = getNameSelected(element);
-	var a = { 'app' : 'explorer',
-			  'params': { 'command': 'dirinfo', 'target': target, 'filelist': [fname] }
-	};  
+	var a = { 'command': 'dirinfo', 'target': target, 'filelist': [fname] };  
 	sendFromInterface(a);
 }
 
@@ -903,10 +880,7 @@ function alreadyInList(parent, name)
 
 function acceptRename(oldname, newname)
 {
-	var a = { 'app' : 'explorer',
-			  'params': { 'command': 'rename', 'target': null, 'oldname': oldname, 'newname' : newname }
-	};
-
+	var a = { 'command': 'rename', 'target': null, 'oldname': oldname, 'newname' : newname 	};
 	parent.sendFromInterface(a);
 }
 

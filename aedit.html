@@ -117,7 +117,7 @@ Make use of:
     </div>
     <div id="apanel">
           <h1>Advanced Editor</h1>
-          <p>Version 2.5</p>
+          <p>Version 2.6</p>
           <p>&copy; 2016-2017 Denis Sureau<br>www.scriptol.com<br></p>
           <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
           <p>
@@ -130,7 +130,6 @@ Make use of:
 const {dialog} = require('electron').remote    
     
 var contentToSave = false;
-var socket = new WebSocket("ws://localhost:1034");
 var editor = ace.edit("editor");
 var project = [];
 var root;
@@ -205,10 +204,9 @@ editor.commands.addCommand({
     
     
 function sendFromInterface(a) {
-  socket.send(
-    JSON.stringify( { "type":"interface", "data": a })
-  );
-}    
+    ipcRenderer.send("interface", JSON.stringify(a));
+}
+
 
 function updateStatusBar(message) {
     document.getElementById('statustext').innerHTML = message;
@@ -341,16 +339,10 @@ function display(data)
 
 function getSource(filepath){
 	var a = { 
-    'app' : 'explorer', 
-    'params': { 
         'path' : filepath, 
-        'command': 'getContent',
-        'target': null
-        } 
+        'command': 'getContent'
     };
-    socket.send(
-        JSON.stringify( { "type":"interface", "data": a })
-    );
+    sendFromInterface(a)
 }
 
 function getActiveRow() {
@@ -483,15 +475,12 @@ function saveProject() {
     if(!(project instanceof Object)) return;
     if(project.list.length == 0) return;
 	var a = { 
-    'app' : 'explorer', 
-    'params': { 
         'command': 'savePrj',
         'list': project.list,
         'name': config.project,
         'active': AEditFileName
-        } 
     };
-    socket.send(JSON.stringify( { "type":"interface", "data": a }));  
+    sendFromInterface(a)
 }
 
 function removeFileFromPrj() {
@@ -620,16 +609,13 @@ function prjCtxMenu(elem) {
    
     
 function preview(openflag) {
-  var a = {  'app': 'explorer', 'params' : {
+    var a = { 
         'command': 'viewtext',
         'path': AEditFileName, 
-        'target': null,
         'open': openflag,
         'ext': ''
-  }};
-  socket.send(
-        JSON.stringify( { "type":"interface", "data": a })
-  );
+    };
+    sendFromInterface(a)
 }    
     
 function manual() {
@@ -660,9 +646,9 @@ function quit() {
   }    
   saveProject();    
   saveIni("aedit.ini.js")  
-  var a = { 'app' : 'explorer', 'params': { 'command': 'quit', }  };
+  var a = { 'command': 'quit' };
   sendFromInterface(a);
-  setTimeout(function() { socket.close(); this.close();}, 100);
+  setTimeout(function() { this.close();}, 100);
 }
 
 /* Shell */
@@ -761,7 +747,7 @@ function act(element) {
 			quit();
 			break;	
 		default:
-			alert("Unknown command");
+			alert("Unknown command " +command);
 	}			
 	editor.focus();
 }
@@ -778,23 +764,18 @@ function changedStatus(status)
 
 function socketConfirm(jobj) {
 	var answer = confirm(jobj.question);
-    var data = jobj.data;
-    switch(data.command) {
+    switch(jobj.command) {
         case "delprj":
-        removeProject(data.path);
+        removeProject(jobj.path);
         break;
     case "unlink":        
-    //case "copyover":
         if(answer===true) {
-            var a = { 'app' : 'explorer', 'params': data };
-            sendFromInterface(a);
+            sendFromInterface(jobj);
         }            
         break;
     case "createdir":
         if(answer===true) {
-            var a = { 'app' : 'explorer',
-		      'params': { 'command': 'mkdir', 'path': data.path, 'target':data.target }
-            };
+            var a = { 'command': 'mkdir', 'path': data.path, 'target':jobj.target };
             sendFromInterface(a);
         };
         break;
@@ -804,27 +785,27 @@ function socketConfirm(jobj) {
 }    
   
     
-socket.onmessage = function(event) {
-    var data = JSON.parse(event.data);
-    switch(data.type) 
+ipcRenderer.on("interface", (event, data) => {
+    var jobj = JSON.parse(data);
+    switch(jobj.type) 
     {
     case "openDoc":
         setActiveRow();
         if(clearDoc() == false) break;   // save aborted  
-        if(data.project instanceof Object)  {  
-            project = data.project; 
+        if(jobj.project instanceof Object)  {  
+            project = jobj.project; 
             config.project = project.name
             saveIni("aedit.ini.js")  
             addProject(project.name)
             updateTooltip();    
         }
-        if(data.content.length > 127) {
-          editor.session.setValue(data.content.slice(9), -1);
+        if(jobj.content.length > 127) {
+          editor.session.setValue(jobj.content.slice(9), -1);
         }
         else {
-		  editor.session.setValue(data.content, -1);
+		  editor.session.setValue(jobj.content, -1);
         }
-        AEditFileName = data.filename;
+        AEditFileName = jobj.filename;
         if(project instanceof Object) {
             if(indexInProject(AEditFileName) != -1) {
                 config.active = AEditFileName;
@@ -832,8 +813,8 @@ socket.onmessage = function(event) {
         }   
         displayFileName();
         var mode = "plain_text";
-        if(data.ext in languageExt)   
-            mode = "ace/mode/" + languageExt[data.ext];
+        if(jobj.ext in languageExt)   
+            mode = "ace/mode/" + languageExt[jobj.ext];
         editor.getSession().setMode(mode); 
         var row = getActiveRow();   
         editor.scrollToLine(row);
@@ -841,31 +822,28 @@ socket.onmessage = function(event) {
         changedStatus(false);
         editor.focus();
         break
+        
     case "openPrj":    
-        project = data.project; 
+        project = jobj.project; 
+            alert("openPrj " + project.name)
         config.project = project.name
         saveIni("aedit.ini.js")  
         addProject(project.name)
         updateTooltip(); 
         projectDisplay();     
-        break;    
-    case "editor":
-        if(data.action == "prompt") {
-		    var p = prompt(data.message);
-            socket.send(JSON.stringify( { "type":"answer", "data": p != null }));
-        }
-        else {
-            alert(data.message);
-        }  
+        break;   
+        
+    case "notification":
+        alert("Message from server: " + jobj.message);
         break;
     case 'confirm':
-        socketConfirm(data);
+        socketConfirm(jobj);
         break;             
     case "message":    
     case "mouse":
         break;  
     case "status":  
-        updateStatusBar(data.content);   
+        updateStatusBar(jobj.content);   
         break;    
     case "saved":
         displayFileName();
@@ -873,10 +851,10 @@ socket.onmessage = function(event) {
         changedStatus(false);   
         break;
     default:
-        alert("Unknow message '" + data.type + "' in editor");
+        alert("Unknow message '" + jobj.type + "' in editor");
         break;    
     }
-}
+})
 
 var lastPanel;
     
@@ -925,22 +903,21 @@ function winload() {
     
 function load()
 {
-    var a = { 'app' : 'explorer', 'params': { 
-	            'command': 'getContent', 
-				'path': AEditFileName,
-                'project':"",
-                'target' : null
-				}};
-    socket.send(JSON.stringify( { "type":"interface", "data": a }));  
+    var a = { 
+	    'command': 'getContent', 
+		'path': AEditFileName,
+        'project':""
+    };
+    sendFromInterface(a)
 }  
     
 function openProject(name, mode) {   
-    var a = { 'app' : 'explorer', 'params': { 
+    var a = { 
         'command': 'openPrj', 
         'name': name, 
         'mode': mode 
-    } };
-    socket.send(JSON.stringify( { "type":"interface", "data": a }));  
+    };
+    sendFromInterface(a)
 }    
     
 
@@ -985,17 +962,14 @@ function save(winflag) {
     var content = editor.getValue();
     if(content.length == 0) return; 
     var a = { 
-        'app' : 'explorer', 
-        'params': { 
-	        'command': 'save', 
-			'filename': AEditFileName, 
-			'content' : content,
-            'convert' : convert,
-            'origin'  : origin,
-			'overwrite' : true 
-	   }
+	    'command': 'save', 
+        'filename': AEditFileName, 
+		'content' : content,
+        'convert' : convert,
+        'origin'  : origin,
+		'overwrite' : true 
     };
-    socket.send(JSON.stringify( { "type":"interface", "data": a }));
+    sendFromInterface(a)
     preview(false)
     if(convert && origin != "") {
         AEditFileName = origin;
@@ -1030,15 +1004,14 @@ function buildtable(editor) {
 
 window.onload=function() {
     lastPanel = document.getElementById("epanel"); 
-    socket.onopen = function(event) {
-        display(null);
-        updateTooltip();
-        var pname = config.project;
-        openProject(pname, false);
+    display(null);
+    updateTooltip();
+    if(config.project == null) {
+        return;
     }
+    var pname = config.project
+    openProject(pname, false);
 }
-    
-
 
 </script>
 
