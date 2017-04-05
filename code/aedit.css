@@ -1,14 +1,12 @@
 /* Advanced Editor (c) 2012-2017 Scriptol.com 
-   Based on  Advanced Explorer (c) 2012 Scriptol.com
-*/
-#body, html
-{
+   Based on  Advanced Explorer (c) 2012 Scriptol.com */
+
+#body, html {
 	margin:0;
 	padding:0;
 	overflow: hidden;
     background:black;
 }
-
 
 #toolbar {
     position:absolute;
@@ -34,6 +32,7 @@
 	width: 34px;
     float:left;
 }
+
 .imagebutton:hover
 {
 	border:1px solid #333;
@@ -47,8 +46,7 @@
     margin:0;
 }
 
-.buttonInput 
-{
+.buttonInput {
 	display:inline-block;
 	margin-right:2px;
     box-sizing: border-box;	
@@ -105,7 +103,7 @@
 	bottom:28px;	
 	width:100%;
 	height:100%;
-	padding:8px;
+	padding:8px 2px 8px 2px;
 	margin:0px;
 	background:black;
     color:white;
@@ -113,12 +111,20 @@
 }
 
 #prjlist p {
-    margin:2px 0 2px 0;
-    padding:0;
+    margin:2px 4px 2px 2px;
+    padding:0 4px 0 4px;
     overflow:hidden;
+    width:auto;
     font-size:14px;
 	font-family:Arial, Tahoma, sans-serif;
+	border:1px solid black;
+	border-radius:4px;  
 }
+
+#prjlist p:hover {
+	border:1px solid #aaa;	
+}
+
 
 #allprjs {
     position:absolute;
@@ -141,7 +147,7 @@
     text-align:center;
 }
 
-#epanel, #lpanel, #spanel, #cpanel, #openel, #apanel { 
+#epanel, #lpanel, #openel, #apanel { 
 	position: absolute;
     float:left;
 	padding:0;
@@ -156,17 +162,30 @@
 	display:block;    
 }
 
-#lpanel, #spanel, #cpanel, #opanel, #apanel {
+#lpanel, #opanel, #apanel {
 	display:none;
     background:#eee;
 }
 
 #apanel {
     text-align:center;
-    padding:64px;
+    padding:16px;
+	width:auto;
+	height:100%;    
 }
 
-#loader, #saver, #creator {
+#loader {
+	display:block;
+	width:100%;
+	height:100%;
+	border: none;
+	overflow:visible;
+	padding:0;
+	margin:0;
+	
+}
+
+#manual {
 	display:block;
 	width:100%;
 	height:100%;
@@ -186,7 +205,6 @@
     bottom:28px;
     background:black;
 }
-
 
 #statusbar {
     display:block;
@@ -222,28 +240,28 @@
 }
 
 .sideright {
-  position:relative;
-  float:right;
-  right:0px;
-  padding:0;
-  overflow:display;
+    position:relative;
+    float:right;
+    right:0px;
+    padding:0;
+    overflow:display;
 }
 
 .tfield {
-  position:relative;
-  display:inline-block;
-  float:left;
-  line-height:20px;
-  padding:2px 8px 2px 8px;
-  margin:4px 4px 0px 0;
-  background:#ddd;
-  border:1px solid #999;
-  border-radius:4px;
-  opacity:0.5;
-  overflow:hidden;
-  color:#000;
-  font-weight:bold;
-  font-family:Arial, sans-serif;
+    position:relative;
+    display:inline-block;
+    float:left;
+    line-height:20px;
+    padding:2px 8px 2px 8px;
+    margin:4px 4px 0px 0;
+    background:#ddd;
+    border:1px solid #999;
+    border-radius:4px;
+    opacity:0.5;
+    overflow:hidden;
+    color:#000;
+    font-weight:bold;
+    font-family:Arial, sans-serif;
 }
 
 .indicator {
@@ -277,34 +295,30 @@
     font-family: Arial,serif;
 }
 
-
-.insert .comlist
-{
+.insert .comlist {
     display:none;
     color:black;
     background:white;	
     font-size:13px;
 }
 
-
 .insert p {
     margin:6px 2px 2px 8px;
 }
 
-.insert:hover .comlist
-{
-  display:block;
-  position:absolute;
-  top:16px;    
-  left:0;
-  z-index:1000;
-  width:128x;
-  min-width:128px;    
-  max-width:128px;
-  min-height:72px;
-  border:1px solid #666;
-  overflow:visible;
-  padding:0;
+.insert:hover .comlist {
+    display:block;
+    position:absolute;
+    top:16px;    
+    left:0;
+    z-index:1000;
+    width:128x;
+    min-width:128px;    
+    max-width:128px;
+    min-height:72px;
+    border:1px solid #666;    
+    overflow:visible;
+    padding:0;
 }
 
 .insert h3 {
@@ -328,44 +342,40 @@
 
 #prjSet {
     display:block;
-    -position:abolute;
     position:relative;
     font-family: Arial,serif;
 }
 
 
-#prjSet span
-{
-  display:none;
-  border-radius:8px;
-  color:black;
-  background:white;	
+#prjSet span {
+    display:none;
+    border-radius:8px;
+    color:black;
+    background:white;	
 }
 
-#prjSet span img
-{
-  float:left;
-  margin:0px 8px 8px 0;
+#prjSet span img {
+    float:left;
+    margin:0px 8px 8px 0;
 }
 
 #prjSet p {
     margin:4px 2px 2px 8px;
 }
 
-#prjSet:hover span
-{
-  display:block;
-  position:absolute;
-  left:0;
-  bottom:8px;    
-  z-index:1000;
-  width:196x;
-  min-width:196px;    
-  max-width:196px;
-  min-height:128px;
-  border:2px solid #ccc;
-  overflow:visible;
-  padding:0;
+#prjSet:hover span {
+    display:block;
+    position:absolute;
+    left:0;
+    bottom:8px;    
+    z-index:1000;
+    width:196x;
+    min-width:196px;    
+    max-width:196px;
+    min-height:128px;
+    border:2px solid #ccc;    
+    overflow:visible;
+    padding:0;
 }
 
 #prjSet h3 {
@@ -390,46 +400,31 @@
     color:#000;
 }
 
-.ctxmenu
-{
-  position:absolute;	
-  width: 96px;
-  height:20px;
-  min-height:20px;
-  padding: 1px 8px 1px 8px;
-  margin:0;
-  left:0;
-  top:0;
-  border: 1px solid #999;
-  color:black;
-  background: #F8F8F8;
-  z-index:1000;
-  overflow: visible;
-  font-weight:normal;
-}
-
-.ctxline
-{
-	display:block;
-	margin:0px;
-	padding:2px 2px 2px 8px;
-	border:1px solid #F8F8F8;
-	border-radius:3px;
+.prjctxm {
+    position:absolute;	
+    width: 96px;
+    height:20px;
+    min-height:20px;
+    padding: 1px 8px 1px 8px;
+    margin:0;
+    left:0;
+    top:0;
+    border: 1px solid #999;
+    border-radius:4px;
+    color:black;
+    background: #F8F8F8;
+    z-index:1000;
+    overflow: visible;
+    font-weight:normal;
 	font-size:13px;
 	font-family:Arial, Helvetica, sans-serif;
-	overflow:visible;
 }
-.ctxline:hover
-{
-	border:1px solid #BBB;
-	background-color: #F0F0F0;
-	background-image: -moz-linear-gradient(top, #ffffff, #e6e6e6);
-	background-image: -ms-linear-gradient(top, #ffffff, #e6e6e6);
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#e6e6e6));
-	background-image: -webkit-linear-gradient(top, #ffffff, #e6e6e6);
-	background-image: -o-linear-gradient(top, #ffffff, #e6e6e6);
-	background-image: linear-gradient(top, #ffffff, #e6e6e6);
-	background-repeat: repeat-x;
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#e6e6e6', GradientType=0);
-}  
 
+.prjctxm p {
+    border:none !important;
+}
+
+.prjctxm p:hover {
+    font-weight:bold;  
+    border:none !important;
+}

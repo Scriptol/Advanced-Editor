@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset=utf-8>
+<title>Confirm Dialog</title>
+</head>
+
+<body>
+<p>Save file before exit?</p>
+<p>
+<input type = "button" value="Do not save" onclick="skip()">
+<input type = "button" value="Save" onclick="saveConfirmed()">
+<input type = "button" value="Cancel" onclick="cancel()">
+</p>
+
+<script>
+    
+var cbAction = null; // callback, function to call    
+
+function close() {
+    parent.confirmDialog.style.display = "none";
+}    
+    
+function skip() {
+	parent.changedStatus(false);
+	close();
+}
+
+function cancel() {
+	close();
+}
+
+function saveConfirmed() {
+	close();
+    cbAction();
+	//parent.saveDialog();
+}
+
+</script>
+
+</body>
+</html>

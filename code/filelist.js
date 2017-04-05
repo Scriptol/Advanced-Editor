@@ -536,23 +536,27 @@ function openProject(element) {
   parent.restartEditor()
 }  
 
-
-
 function open(element, forcePage)
 {
-  var isIExplorer = /*@cc_on!@*/false || !!document.documentMode;
-  var target = pointFile(element);
-  var fpathid = target + "path";
-  var fpath = document.getElementById(fpathid);
-  filepath = fpath.value;
-  var fname =  getNameSelected(element);
-  if(!isIExplorer)
-    filepath = filepath.replace(/\\/gi, '/');
-  var sep = '/';
-  if(filepath.slice(-1) == '/') sep = '';
-  if(filepath.slice(-1) == '\\') sep = '';
-  var fname = filepath + sep + fname;
-  view(element, fname, target, forcePage);
+    var isIExplorer = false || !!document.documentMode;
+    var target = pointFile(element);
+    var fpathid = target + "path";
+    var fpath = document.getElementById(fpathid);
+    filepath = fpath.value;
+    var fname =  getNameSelected(element);
+    if(!isIExplorer)
+        filepath = filepath.replace(/\\/gi, '/');
+    var sep = '/';
+    if(filepath.slice(-1) == '/') sep = '';
+    if(filepath.slice(-1) == '\\') sep = '';
+    var fname = filepath + sep + fname;
+    var a = { 
+        'command': 'viewtext',
+        'path': fname, 
+        'open': true,
+        'ext': ''
+    };
+    sendFromInterface(a)    
 }
 
 
@@ -565,7 +569,7 @@ function rsel(element)
   var isImage;
   var ext = getNameSelected(element);
   var epos = ext.lastIndexOf('.');
-	ext = ext.slice(epos + 1);  
+  ext = ext.slice(epos + 1);  
   switch(ext.toLowerCase())
   {
     case 'gif':

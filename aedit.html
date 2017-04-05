@@ -109,25 +109,21 @@ Make use of:
     <div id="lpanel">
         <iframe id="loader" src="loader.html" width="640" height="500"></iframe>
     </div>      
-    <div id="spanel">
-            <iframe id="saver" src="saver.html" width="640" height="500"></iframe>
-    </div>
     <div id="opanel">
-            <iframe id="options" src="settings.html" width="640" height="500"></iframe>
+        <iframe id="options" src="settings.html" width="640" height="500"></iframe>
     </div>
     <div id="apanel">
-          <h1>Advanced Editor</h1>
-          <p>Version 2.6</p>
-          <p>&copy; 2016-2017 Denis Sureau<br>www.scriptol.com<br></p>
-          <p id="manual" onclick="act(this)" style="color:#369"><b>MANUAL</b></p>
-          <p>
-          <input type="button" id="hideme" onClick="act(this)" value="Close" /> 
-          </p>      
+        <iframe id="manual" src="manual.html" width="640" height="500"></iframe>
     </div>
 </div> <!--main-->
     
 <script>
-const {dialog} = require('electron').remote    
+const {dialog} = require('electron').remote   
+
+var aPanel = document.getElementById("apanel")
+var ePanel = document.getElementById("epanel")
+var lPanel = document.getElementById("lpanel")
+var oPanel = document.getElementById("opanel")
     
 var contentToSave = false;
 var editor = ace.edit("editor");
@@ -312,10 +308,7 @@ function display(data)
   {
     setActiveRow();
     clearDoc();
-    if(data.content.length > 127)
-      editor.session.setValue(data.content.slice(9), -1);
-    else
-      editor.session.setValue(data.content, -1);
+    editor.session.setValue(data.content, -1);
     var mode = "plain_text";
     if(data.ext in languageExt)   
       mode = "ace/mode/" + languageExt[data.ext];
@@ -337,7 +330,7 @@ function display(data)
 
 /* Project Management */
 
-function getSource(filepath){
+function getSource(filepath) {
 	var a = { 
         'path' : filepath, 
         'command': 'getContent'
@@ -405,7 +398,7 @@ function addFileToCurrentProject(name) {
     saveIni("aedit.ini.js")     
     updateTooltip();
     if(indexInProject(AEditFileName) != -1) {
-        alert("Already exists!");
+        alert("File already in the list!");
         return;
     }
     project.list.push([AEditFileName, editor.getFirstVisibleRow()]);
@@ -474,6 +467,7 @@ function projectDisplay() {
 function saveProject() {
     if(!(project instanceof Object)) return;
     if(project.list.length == 0) return;
+    setActiveRow()
 	var a = { 
         'command': 'savePrj',
         'list': project.list,
@@ -570,39 +564,42 @@ function updateTooltip() {
 }
 
 function prjCtxMenu(elem) {
-  var x = document.getElementById('ctx1');
-  if(x) x.parentNode.removeChild(x); 
+    var x = document.getElementById('ctx1');
+    if(x) x.parentNode.removeChild(x); 
   
-  var parent = elem.parentNode; 
-  var d = document.createElement('div');
-  parent.appendChild(d);
+    var parent = elem.parentNode; 
+    var d = document.createElement('div');
+    parent.appendChild(d);
 
-  d.id = 'ctx1';
-  d.className = 'ctxmenu';
-  var mx = elem.offsetLeft - elem.scrollLeft + elem.clientLeft + 32;
-  var my = elem.offsetTop - elem.scrollTop + elem.clientTop +8;  
-  d.style.left = mx + "px";
-  d.style.top = my + "px";
-  d.onmouseover = function(e) { this.style.cursor = 'pointer'; } 
-  d.onclick = function(e) { parent.removeChild(d);  }
-  document.body.onclick = function(e) {
-    try { parent.removeChild(d);}
-    catch(e) {}   
-  }
+    d.id = 'ctx1';
+    d.className = 'prjctxm';
+    var mx = elem.offsetLeft - elem.scrollLeft + elem.clientLeft + 32;
+    var my = elem.offsetTop - elem.scrollTop + elem.clientTop +8;  
+    d.style.left = mx + "px";
+    d.style.top = my + "px";
+    d.onmouseover = function(e) { 
+        this.style.cursor = 'pointer'; 
+    } 
+    d.onclick = function(e) { 
+        parent.removeChild(d);  
+    }
+    document.body.onclick = function(e) {
+        try { parent.removeChild(d);}
+        catch(e) {}   
+    }
   
-  var p = document.createElement('p');
-  d.appendChild(p);
-  p.onclick=function() {
-      var temp = currentInProject  
-      currentInProject = elem.title
-      removeFileFromPrj() 
-      currentInProject = temp
-      projectDisplay()
-  };
-  p.setAttribute('class', 'ctxline');
-  p.innerHTML = "Remove"; 
+    var p = document.createElement('p');
+    d.appendChild(p);
+    p.innerHTML = "Remove"; 
+    p.onclick=function() {
+        var temp = currentInProject  
+        currentInProject = elem.title
+        removeFileFromPrj() 
+        currentInProject = temp
+        projectDisplay()
+    };
   
-  return false;
+    return false;
 }
 
 /* Project end */
@@ -618,16 +615,6 @@ function preview(openflag) {
     sendFromInterface(a)
 }    
     
-function manual() {
-    var ifr=document.createElement("iframe")
-    var ap=document.getElementById("apanel")
-    ap.innerHTML = "";
-    ap.style.padding="0";
-    ap.appendChild(ifr);
-    ifr.style.width="100%";
-    ifr.style.height="100%";
-    ifr.src="manual.html";
-}    
 
 var lst=null;  
 function goline(element) {
@@ -646,8 +633,7 @@ function quit() {
   }    
   saveProject();    
   saveIni("aedit.ini.js")  
-  var a = { 'command': 'quit' };
-  sendFromInterface(a);
+  sendFromInterface({ 'command': 'quit' });
   setTimeout(function() { this.close();}, 100);
 }
 
@@ -737,12 +723,6 @@ function act(element) {
         case "about":
             about()
             break;
-        case "hideme":
-            hideMe()
-            break;
-        case "manual":
-            manual();
-            break;
 		case "quit":
 			quit();
 			break;	
@@ -762,28 +742,6 @@ function changedStatus(status)
     contentToSave = status;  
 }
 
-function socketConfirm(jobj) {
-	var answer = confirm(jobj.question);
-    switch(jobj.command) {
-        case "delprj":
-        removeProject(jobj.path);
-        break;
-    case "unlink":        
-        if(answer===true) {
-            sendFromInterface(jobj);
-        }            
-        break;
-    case "createdir":
-        if(answer===true) {
-            var a = { 'command': 'mkdir', 'path': data.path, 'target':jobj.target };
-            sendFromInterface(a);
-        };
-        break;
-    default:
-        break;   
-  }
-}    
-  
     
 ipcRenderer.on("interface", (event, data) => {
     var jobj = JSON.parse(data);
@@ -791,6 +749,10 @@ ipcRenderer.on("interface", (event, data) => {
     {
     case "openDoc":
         setActiveRow();
+        if(aPanel.style.display=="block") {
+            aPanel.style.display="none"    
+            ePanel.style.display="block"    
+        }
         if(clearDoc() == false) break;   // save aborted  
         if(jobj.project instanceof Object)  {  
             project = jobj.project; 
@@ -799,12 +761,8 @@ ipcRenderer.on("interface", (event, data) => {
             addProject(project.name)
             updateTooltip();    
         }
-        if(jobj.content.length > 127) {
-          editor.session.setValue(jobj.content.slice(9), -1);
-        }
-        else {
-		  editor.session.setValue(jobj.content, -1);
-        }
+        
+        editor.session.setValue(jobj.content, -1);
         AEditFileName = jobj.filename;
         if(project instanceof Object) {
             if(indexInProject(AEditFileName) != -1) {
@@ -813,8 +771,9 @@ ipcRenderer.on("interface", (event, data) => {
         }   
         displayFileName();
         var mode = "plain_text";
-        if(jobj.ext in languageExt)   
+        if(jobj.ext in languageExt) {  
             mode = "ace/mode/" + languageExt[jobj.ext];
+        }
         editor.getSession().setMode(mode); 
         var row = getActiveRow();   
         editor.scrollToLine(row);
@@ -822,24 +781,24 @@ ipcRenderer.on("interface", (event, data) => {
         changedStatus(false);
         editor.focus();
         break
-        
     case "openPrj":    
         project = jobj.project; 
-            alert("openPrj " + project.name)
         config.project = project.name
         saveIni("aedit.ini.js")  
         addProject(project.name)
         updateTooltip(); 
         projectDisplay();     
         break;   
-        
-    case "notification":
-        alert("Message from server: " + jobj.message);
-        break;
     case 'confirm':
-        socketConfirm(jobj);
+     	var answer = confirm(jobj.question);
+        if(answer && jobj.command == "delprj") {
+            removeProject(jobj.path);
+        }
         break;             
-    case "message":    
+    case "message": 
+        alert(jobj.content)   
+        break;
+    case "notification":
     case "mouse":
         break;  
     case "status":  
@@ -847,11 +806,10 @@ ipcRenderer.on("interface", (event, data) => {
         break;    
     case "saved":
         displayFileName();
-        //updateStatusBar(true);
         changedStatus(false);   
         break;
     default:
-        alert("Unknow message '" + jobj.type + "' in editor");
+        alert("Unknow message: " + jobj.type);
         break;    
     }
 })
@@ -859,28 +817,21 @@ ipcRenderer.on("interface", (event, data) => {
 var lastPanel;
     
 function about() {
-    var apanel = document.getElementById("apanel")
-	if(apanel.style.display == "block") {
+	if(aPanel.style.display == "block") {
     	lastPanel.style.display="block"    
-    	apanel.style.display="none"
+    	aPanel.style.display="none"
 		return;
 	}
     lastPanel.style.display="none"    
-    apanel.style.display="block"
+    aPanel.style.display="block"
 }
     
-function hideMe() {
-    var apanel = document.getElementById("apanel")
-    lastPanel.style.display="block"    
-    apanel.style.display="none"
-}    
 
 function restartEditor() {
-    var epanel = document.getElementById("epanel")
-    if(epanel != lastPanel) {
+    if(ePanel != lastPanel) {
         lastPanel.style.display="none"    
-        epanel.style.display="block"
-        lastPanel = epanel    
+        ePanel.style.display="block"
+        lastPanel = ePanel    
     }
     editor.focus();
 }
@@ -889,12 +840,12 @@ var AEditSyncPath = undefined
 var AEditFileName = ""
 
 function winload() {
-    var lpanel = document.getElementById("lpanel")
     var loader = document.getElementById("loader")
     var fc = (loader.contentWindow || loader.contentDocument);
     lastPanel.style.display="none"
-    lpanel.style.display="block"
-    lastPanel = lpanel    
+    aPanel.style.display="none"    
+    lPanel.style.display="block"
+    lastPanel = lPanel    
     fc.startLoader() 
     fc.setLoadPath(); 
     return true;
@@ -912,6 +863,7 @@ function load()
 }  
     
 function openProject(name, mode) {   
+    saveProject()
     var a = { 
         'command': 'openPrj', 
         'name': name, 
@@ -922,15 +874,14 @@ function openProject(name, mode) {
     
 
 var winsave = function() {
-    var spanel = document.getElementById("spanel")
-    var saver = document.getElementById("saver")
-    var fc = (saver.contentWindow || saver.contentDocument);
-    lastPanel.style.display="none"    
-    spanel.style.display="block"
-    lastPanel = spanel
-    fc.startSaver() 
-    fc.setSavePath(); 
-    return true;
+    var newpath = dialog.showSaveDialog(null, {
+        title:"Save current text in a file",
+        defaultPath: AEditFileName,
+        buttonLabel: "Save"
+    })
+    if(newpath != undefined && newpath.length > 0) return newpath;
+    return "";  // abort
+    
 }
 
 function option() {
@@ -948,7 +899,9 @@ function getExtension(fname) {
 function save(winflag) {
     var nflag = AEditFileName == undefined || AEditFileName == "";
     if(winflag || nflag)  { 
-        return winsave() 
+        var x = winsave() 
+        if(x == "") return;
+        AEditFileName = x;
     }
     editor.focus();
     setActiveRow();

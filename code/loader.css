@@ -27,10 +27,7 @@
 	overflow:hidden;
 }
 
-
-
-.filechooser
-{
+.filechooser {
 	display:block;
 	text-align:left;
 	color:#036;
@@ -41,27 +38,23 @@
 	overflow-y: scroll;	
 	font-size:14px;
 	font-family: Arial, Helvetica, sans-serif;
-	-moz-user-select: none;
 	-webkit-user-select: none;
 	margin:0;
 	box-sizing: border-box;		
 }
 
-.flist
-{
+.flist {
 	margin:0;
 	padding: 0 8px 0 8px; 
 	overflow:hidden;
 	box-sizing: border-box;	 
 }
 
-.flist:focus
-{
+.flist:focus {
 	outline:none;
 }
 
-.file, .dir
-{
+.file, .dir {
 	display:inline-block;
 	line-height:18px;
 	border:1px solid white;
@@ -72,25 +65,21 @@
 	border-radius:3px;	  
 }
 
-
-.dir img, .file img, .entrybold img
-{
+.dir img, .file img, .entrybold img {
 	float:left;
 	width:24px;
 	height:18px;
 	margin-right:8px;
 }
 
-.dir:hover, .file:hover
-{
+.dir:hover, .file:hover {
 	border:1px dotted black;
 	background-color: #F0F0F0;
 	background-image: linear-gradient(top, #ffffff, #e6e6e6);
 	background-repeat: repeat-x;
 }
 
-.entrybold, .entrybold:hover
-{
+.entrybold, .entrybold:hover {
 	line-height:18px;
 	display:inline-block;
 	margin:1px 1px 1px 1px;
@@ -109,11 +98,11 @@
 	height:26px;
 	padding:2px 2px 0 8px;
 }
+
 .fsimg {
 	width:22px;
 	height:22px;
 }
-
 
 .lstats {
   float:left;
@@ -123,11 +112,9 @@
   float:right;
 }
 
-.timesize
-{
+.timesize {
 	float:right;
 }
-
 
 #fspath {
 	position:relative;
@@ -154,11 +141,13 @@
 	float:left; 
 	text-shadow: 1px 1px 2px #999;
 }
+
 #pathcontrol {
 	display:inline-block;
 	margin:4px 0 0 8px;
 	padding:0;
 }
+
 #scontentpath, #lcontentpath {
 	font-size:16px;		
 	line-height:20px;
@@ -166,19 +155,15 @@
 	margin:0 0 4px 0;
 	border-radius:4px;
 }
+
 .bpath {
 	font-family: Arial, Helvetica, sans-serif;
 	font-weight: normal;
 	line-height:20px;
 	font-size:16px;	
 }
-.bsave {
-	background:green;
-}
 
-
-.ctxmenu
-{
+.ctxmenu {
   position:absolute;	
   width: 128px;
   height:auto;
@@ -194,8 +179,7 @@
   font-weight:normal;
 }
 
-.ctxline
-{
+.ctxline {
 	display:block;
 	margin:0px;
 	padding:2px 2px 2px 8px;
@@ -205,8 +189,8 @@
 	font-family:Arial, Helvetica, sans-serif;
 	overflow:visible;
 }
-.ctxline:hover
-{
+
+.ctxline:hover {
 	border:1px solid #BBB;
 	background-color: #F0F0F0;
 	background-image: linear-gradient(to top, #ffffff, #e6e6e6);
@@ -214,10 +198,9 @@
 }  
 
 
-/* Buttons: Copyright 2011-2015 Nutraide.com/Scriptol.com */
+/* Buttons: Copyright 2011-2017 Nutraide.com/Scriptol.com */
 
-.button
-{
+.button {
 	display:inline-block;
 	position:relative;
 	height:28px;
@@ -236,49 +219,46 @@
 	border-radius:4px;
 }
 
-
-.bblue
-{
+.bblue {
 	border: 1px solid #079;
 	background: #09c;
 	box-shadow: inset 1px 1px 1px 0 rgba(255,255,255,0.6),
 		1px 2px 4px 0 rgba(128,128,128,0.8);
 	background: linear-gradient(to top left,  #00adee,  #0078a5);
 }
-.bblue:hover
-{
+
+.bblue:hover {
 	background: #08B;
 	background: linear-gradient(to top left,   #006688, #0095cc,);
 }
 
-.bred.button
-{
+.bred.button {
 	border: 1px solid #840;
 	background-color:#F03;
 	box-shadow: inset 1px 1px 1px 0 rgba(255,255,255,0.6),
 		1px 2px 4px 0 rgba(128,128,128,0.8);
 	background:linear-gradient(to top left,  #F04,  #A02);
 }
-.bred.button:hover
-{
+
+.bred.button:hover {
 	background-color:#dd0011;
 	background:linear-gradient(to top left,  #E02,  #600);
 }
-.bgreen.button
-{
+
+.bgreen.button {
 	border: 1px solid #084;
 	background-color:#0F3;
 	box-shadow: inset 1px 1px 1px 0 rgba(255,255,255,0.6),
 		1px 2px 4px 0 rgba(128,128,128,0.8);
 	background:linear-gradient(to top left,  #0F4,  #0A2);
 }
-.bgreen.button:hover
-{
+
+.bgreen.button:hover {
 	background-color:#00dd11;
 	background:linear-gradient(to top left,  #0E2,  #060);
 }
-.bgray.button
-{
+
+.bgray.button {
 	background-color:#CCCCCC;
 	color:#666;
 	border: 1px solid #999;
@@ -288,8 +268,8 @@
 	background: #ccc;
 	background: linear-gradient(to top left,  #bbb, #eee  );
 }
-.bgray.button:hover
-{
+
+.bgray.button:hover {
 	background-color:#999;
 	background: linear-gradient(to top left,  #999,  #ddd);
 	color:#DDD;

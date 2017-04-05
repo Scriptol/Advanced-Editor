@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+ <!DOCTYPE html>
 <html>
 <head>
 <meta charset=utf-8>
@@ -19,7 +19,10 @@ h3 {
 </head>
 
 <body>
-<h1>AEdit Manual</h1>
+<h1>Advanced Editor Manual</h1>
+ <p>Version 2.7</p>
+ <p>&copy; 2016-2017 Denis Sureau<br>www.scriptol.com<br></p>
+ <hr>
 <h3>Icons</h3>
 
 <p>The purpose of each button is displayed in a tooltip when the mouse stays over the icon. Some button requires  explanations. </p>
@@ -45,7 +48,7 @@ You can also enter  directly a line number. The editor jumps directly to the num
 <p><img src="images/preview.png" width="32" height="32"> Opens a window to display the document in final form, such as a web page if the edited file is in HTML or Markdown. When you edit the document and save it with CTRL-S the page is updated. You can also click on the preview icon for the update.</p>
 
 <p><b>Close</b></p>
-<p><img src="images/exit.png" width="32" height="32"> This button is important because, before to close the program, it saves the environment and verifies also that the current document is saved. If you close the browser without to click on this button, your last edits will be lost. The same if  you reload the page.</p>
+<p><img src="images/exit.png" width="32" height="32"> This button is important because, before to close the program, it saves the environment and verifies also that the current document is saved. If you close the application without to use this button, your last edits will be lost.</p>
 
 <h3>Shortcuts</h3>
 <p>CTRL-S: Save the content in the same file.</p>
@@ -60,11 +63,13 @@ You can also enter  directly a line number. The editor jumps directly to the num
 <p>TAB: Indent.</p>
 <p>SHIFT-TAB: Unindent. </p>
 <h3>Loading and saving</h3>
-<p>These operations are done with a window that opens in place of the editor, by clicking the Open or Save icon.<br>
-  You click Cancel to return to the editor.</p>
+<p>Loading is done through a window that opens in place of the editor, by clicking the Open icon.<br>
+  Click Cancel to return to the editor.</p>
 <p>To change the drive or go directly to a directory, enter the drive name or the path in the input  field at the bottom, and wait a second. For example, to go to the root of C, type:</p>
 <pre>c:/</pre>
 <p>The last character must be / to denote a directory.</p>
+<p>When a project file is selected, you can either edit it or load it to replace the current project.</p>
+<p>Saving is done through  a native dialog box.</p>
 <h3>Project management</h3>
 <p>A project is a source file list on the left of the editor.</p>
 <p>The current file can be added to the project by clicking on this <img src="images/prjadd.png" width="22" height="22">icon.<br>
@@ -74,8 +79,6 @@ You can also enter  directly a line number. The editor jumps directly to the num
 <p>You do not need to save the project, it is a persistent object, always updated.  The cursor position in each source file is saved. </p>
 <h4>Quick select of a project</h4>
 <p>If you move the mouse over the name of the current projet at the bottom of the window, a tooltip appears with the list of projects created or loaded by the editor. Click on a name to open a project. </p>
-<p>To remove a name from this list, you must edit the file aedit.ini.js in the <i>code</i> subdirectory. Then you must reload the page with the button of the navigateur to update data in memory. Otherwise the file manually modified could be overwritten by data in memory. </p>
-<p>&nbsp;</p>
 <hr>
 <p><small>&copy; 2016-2017 Denis Sureau</small></p>
 </body>
