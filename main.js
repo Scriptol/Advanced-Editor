@@ -4,7 +4,9 @@
 	Free, open source under the GPL 3 License.
 */
 
-const fs = require("fs");
+const fs = require("fs"),
+      path = require("path"),
+      url = require("url");
 const {app, BrowserWindow, ipcMain} = require('electron');
 const explorer = require("explorer");
 
@@ -40,7 +42,11 @@ function createWindow () {
   process.resourcesPath = __dirname
   console.log("Working directory : " + process.resourcesPath)
 
-  win.loadURL(__dirname + '/aedit.html');
+  win.loadURL(url.format({
+    pathname: path.join(__dirname, 'aedit.html'),
+    protocol: 'File',
+    slashes: true
+  }))    
   win.show()
   win.on('closed', () => { win = null })
 }

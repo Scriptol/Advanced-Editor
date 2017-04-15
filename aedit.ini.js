@@ -1,7 +1,8 @@
 var config={
     "dir": "/",
     "path": "/",
-    "theme": "Chaos",
+    "theme": "Tomorrow_Night_Bright",
+    "fontSize": "14",
     "project": "",
     "prjList": [
     ]
