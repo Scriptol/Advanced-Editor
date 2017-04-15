@@ -128,7 +128,7 @@ var oPanel = document.getElementById("opanel")
 var contentToSave = false;
 var editor = ace.edit("editor");
 var project = [];
-var root;
+var rootdir;
     
 var languageExt = {
   "c": "c_cpp",
@@ -299,33 +299,34 @@ var project = undefined;
 
 function display(data)
 {       
-  editor.setTheme("ace/theme/" + config.theme.toLowerCase());  
-  var fontSize = parseInt(config.fontSize);
-  editor.setFontSize(fontSize);
-  editor.setShowPrintMargin(false);
-
-  if(data != null && data.content != null)
-  {
-    setActiveRow();
-    clearDoc();
-    editor.session.setValue(data.content, -1);
-    var mode = "plain_text";
-    if(data.ext in languageExt)   
-      mode = "ace/mode/" + languageExt[data.ext];
-    editor.getSession().setMode(mode);    
-    AEditFileName = data.filename;
-    displayFileName();
-    changedStatus(false);
-    updateStatusBar(AEditFileName);
-    if("project" in data && data.project != null) {
-        project = data.project.list;
-        config.project = data.project.name;
-        editor.scrollToLine(getActiveRow());
-        updateProjectName();        
+    editor.setTheme("ace/theme/" + config.theme.toLowerCase());  
+    var fontSize = parseInt(config.fontSize);
+    editor.setFontSize(fontSize);
+    editor.setShowPrintMargin(false);
+    editor.getSession().setTabSize(4);
+    editor.getSession().setUseWrapMode(true);
+    
+    if(data != null && data.content != null) {
+        setActiveRow();
+        clearDoc();
+        editor.session.setValue(data.content, -1);
+        var mode = "plain_text";
+        if(data.ext in languageExt)   
+        mode = "ace/mode/" + languageExt[data.ext];
+        editor.getSession().setMode(mode);    
+        AEditFileName = data.filename;
+        displayFileName();
+        changedStatus(false);
+        updateStatusBar(AEditFileName);
+        if("project" in data && data.project != null) {
+            project = data.project.list;
+            config.project = data.project.name;
+            editor.scrollToLine(getActiveRow());
+            updateProjectName();        
+        }
+        projectDisplay();  
     }
-    projectDisplay();  
-  }
-  editor.focus();
+    editor.focus();
 }
 
 /* Project Management */
@@ -415,6 +416,7 @@ function addFileToCurrentProject(name) {
     
 function createProject() {
     if(project instanceof Object) return true;
+    if(config.dir =="/") config.dir=rootdir;
     var fpath = dialog.showSaveDialog(null, {
         title:"Create new project",
         defaultPath: config.dir,
@@ -959,6 +961,7 @@ window.onload=function() {
     lastPanel = document.getElementById("epanel"); 
     display(null);
     updateTooltip();
+    rootdir = __dirname;
     if(config.project == null) {
         return;
     }

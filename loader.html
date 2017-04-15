@@ -49,9 +49,6 @@ function loadToEdit() {
   var f = document.getElementById("lcontentpath").value
   parent.AEditFileName = f
   parent.load()
-  config.dir = extractDir(f)
-  config.path = f;
-  saveIni("aedit.ini.js")
   parent.restartEditor()
 }
 

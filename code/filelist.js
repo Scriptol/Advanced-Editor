@@ -208,19 +208,19 @@ function sortByDate(a, b) {
   return 0;
 }
 
-function fileList(content, sortMode)
+function fileList(jobj, sortMode)
 {
-	var target = content.target;
-	insidezip[target]=content.iszip;
+	var target = jobj.target;
+	insidezip[target]=jobj.iszip;
 	var d = document.getElementById(target);
-	var extmask = content.extmask; 
-	var filepath = content.path;
+	var extmask = jobj.extmask; 
+	var filepath = jobj.path;
 	var fpathid = target + "path";
 	var fpath = document.getElementById(fpathid);
 	fpath.value = filepath;
   
 	var listid = target + "list";
-	var dir = content.list;
+	var dir = jobj.list;
     switch(sortMode) {
     case SORT_BY_SIZE:
       dir.sort(sortBySize);
@@ -864,7 +864,7 @@ function chgPath(elem) {
         if(lastchar == "/" || lastchar == "\\" || lastchar == ":") {  
             if(lastchar == ":") npath += "/";
             config.dir = npath;
-            fileAccess();
+            chDir(npath, 'lcontent');
             saveIni("aedit.ini.js")
         }
     }, 1500);
@@ -880,70 +880,4 @@ function alreadyInList(parent, name)
 		child = child.nextSibling;
 	}
     return false;
-}
-
-function acceptRename(oldname, newname)
-{
-	var a = { 'command': 'rename', 'target': null, 'oldname': oldname, 'newname' : newname 	};
-	parent.sendFromInterface(a);
-}
-
-var elementRename = function(spanitem)
-{
-	var saved = spanitem.innerHTML;
-    var path = extractDir(spanitem.getAttribute("data-url"))
-	var p1 = saved.indexOf('>');
-	var p2 = saved.indexOf('<', p1);
-    if(p2 == -1)
-        p2 = saved.length;
-	var oldname = saved.slice(p1 + 1, p2);
-    oldname = noHTMLchars(oldname);
-
-	var x = document.createElement("input");
-	x.setAttribute('type', 'text');
-	x.setAttribute('value', oldname);
-	x.setAttribute('size', '40');
-
-    x.onkeypress = function(evt) {
-    evt.stopPropagation();
-  	var code = evt.keyCode || evt.which;
-  	var code = evt.keyCode || evt.which;
-		
-    if(code == 13)
-    {
-		var newname = x.value;
-		if(newname)
-		{
-            if(alreadyInList(spanitem.parentNode, newname))
-            {
-            alert("Name already used");
-            }
-            else
-            {
-				  acceptRename(path + "/" + oldname, path + "/" + newname);
-				  saved = saved.slice(0, p1 + 1) + newname + saved.slice(p2);
-            }
-		}
-		x.blur();
-    }
-    else
-    if(evt.ctrlKey)
-    switch(code)
-    {
-      case 17: 	x.blur();
-            break;
-    }
-
-	};
-
-    x.onkeydown = function(evt) {
-        evt.stopPropagation();
-    }
-
-	x.onblur = function(evt) {
-		spanitem.innerHTML = saved;
-	};
-	spanitem.innerHTML = "";
-	spanitem.appendChild(x);
-	x.focus();
 }

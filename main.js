@@ -5,7 +5,6 @@
 */
 
 const fs = require("fs"),
-      path = require("path"),
       url = require("url");
 const {app, BrowserWindow, ipcMain} = require('electron');
 const explorer = require("explorer");
@@ -43,7 +42,7 @@ function createWindow () {
   console.log("Working directory : " + process.resourcesPath)
 
   win.loadURL(url.format({
-    pathname: path.join(__dirname, 'aedit.html'),
+    pathname: __dirname + "/aedit.html",
     protocol: 'File',
     slashes: true
   }))    
