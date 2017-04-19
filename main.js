@@ -38,8 +38,8 @@ function createWindow () {
   win.setMenu(null)
   //win.webContents.openDevTools()
   
-  process.resourcesPath = __dirname
-  console.log("Working directory : " + process.resourcesPath)
+  explorer.rootdir = __dirname
+  console.log("Working directory : " + explorer.rootdir)
 
   win.loadURL(url.format({
     pathname: __dirname + "/aedit.html",
