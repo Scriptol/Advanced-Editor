@@ -524,7 +524,6 @@ function edit(element)
   parent.AEditFileName = f
   parent.load()
   config.dir = extractDir(f)
-  config.path = f;
   saveIni("aedit.ini.js")
   parent.restartEditor()    
 }

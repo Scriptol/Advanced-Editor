@@ -425,7 +425,6 @@ function createProject() {
     if(fpath == undefined || fpath.length == 0) return false;
     fpath = canonicalPath(fpath)
     config.dir = extractDir(fpath)
-    config.path = fpath;
     if(fpath.lastIndexOf(".") == -1) {
         fpath += ".prj";
     }
@@ -759,7 +758,6 @@ ipcRenderer.on("interface", (event, data) => {
         if(jobj.project instanceof Object)  {  
             project = jobj.project; 
             config.project = project.name
-            saveIni("aedit.ini.js")  
             addProject(project.name)
             updateTooltip();    
         }
@@ -781,6 +779,8 @@ ipcRenderer.on("interface", (event, data) => {
         editor.scrollToLine(row);
         projectDisplay(); 
         changedStatus(false);
+        config.dir=extractDir(AEditFileName);
+        saveIni("aedit.ini.js")          
         editor.focus();
         break
     case "openPrj":    
@@ -850,6 +850,7 @@ function winload() {
     lastPanel = lPanel    
     fc.startLoader() 
     fc.setLoadPath(); 
+    saveIni("aedit.ini.js")     
     return true;
 }
 
