@@ -12,7 +12,6 @@ const explorer = require("explorer");
 var mainEvent;
 
 ipcMain.on('interface', (event, data) => {
-   //console.log("Received: " + data) 
    mainEvent = event;
    var jo = JSON.parse(data);
    jo.event = event;

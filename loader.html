@@ -70,8 +70,12 @@ ipcRenderer.on("filelist", (event, data) => {
 
 function startLoader() {
     window.alert=top.alert;
+    var path = config.dir
+    if(parent.AEditFileName != undefined) {
+        path = parent.extractDir(parent.AEditFileName)
+    }
     var a = {
-        'path' : config.dir,
+        'path' : path,
         'command': 'saveas',
         'target': "lcontent",
         'drag' : false
