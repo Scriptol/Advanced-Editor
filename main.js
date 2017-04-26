@@ -22,9 +22,8 @@ ipcMain.on('interface', (event, data) => {
 
 console.log("Starting Electron...")
 
-let win = explorer.win;
 function createWindow () {
-  win = new BrowserWindow({ 
+  var win = new BrowserWindow({ 
     'width': 1060, 
     'height': 680, 
     'show':false,
@@ -37,8 +36,8 @@ function createWindow () {
   win.setMenu(null)
   //win.webContents.openDevTools()
   
-  explorer.rootdir = __dirname
-  console.log("Working directory : " + explorer.rootdir)
+  explorer.setRoot(__dirname)
+  console.log("Working directory : " + explorer.getRoot())
 
   win.loadURL(url.format({
     pathname: __dirname + "/aedit.html",
