@@ -469,14 +469,17 @@ function sel(element)
     if(filepath != null) {
         SyncPath.value = filepath;
         var pbutton = document.getElementById("prjButton");
+        var ibutton = document.getElementById("incButton");
         if(pbutton instanceof HTMLInputElement) { 
             var p = filepath.lastIndexOf('.');
             var ext = filepath.slice(p + 1);
             if(ext == "prj") {       
                 pbutton.style.display="inline-block"
+                ibutton.style.display="none"
             } 
             else {
                 pbutton.style.display="none"
+                ibutton.style.display="inline-block"
             }
      }
     }

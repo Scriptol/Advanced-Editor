@@ -18,8 +18,10 @@ License GPL 3.0
             <div id="pathcontrol">
       	    <input type="text" class="innpath" id="lcontentpath" size="45" value="/" onkeyup="chgPath(this)">
             <input type="button" class="bpath button bgray" value="Cancel" onclick="cancel()"/>
-            <input type="button" class="bpath bsave button bgreen" value="Edit" onclick="loadToEdit()"/>
-            <input type="button" class="bpath bsave button bgreen" id="prjButton" style="display:none" value="Load" onclick="loadProject()"/>
+            <input type="button" class="bpath bsave button bgreen" value="Edit" onclick="loadToEdit(false)"/>
+            <input type="button" class="bpath button bgreen" id="incButton"  value="Include" onclick="loadToEdit(true)"/>
+    
+            <input type="button" class="bpath button bgreen" id="prjButton" style="display:none" value="Load" onclick="loadProject()"/>
         </div>
     </div>
 </div>
@@ -32,12 +34,12 @@ function addKeyListEvents(target) {
 
 
 function setLoadPath() {
-  SyncPath = document.getElementById("lcontentpath")  // SyncPath from FileList
-  parent.AEditSyncPath = SyncPath;
+    SyncPath = document.getElementById("lcontentpath")  // SyncPath from FileList
+    parent.AEditSyncPath = SyncPath;
 }
 
 function cancel() {
-  parent.restartEditor();
+    parent.restartEditor();
 }
 
 function extractDir(fname)  {
@@ -45,26 +47,29 @@ function extractDir(fname)  {
     return fname.slice(0, p)
 }
 
-function loadToEdit() {
-  var f = document.getElementById("lcontentpath").value
-  parent.AEditFileName = f
-  parent.load()
-  parent.restartEditor()
+function loadToEdit(incflag) {
+    var f = document.getElementById("lcontentpath").value
+    parent.AEditFileName = f
+    parent.load()
+    if(incflag) {
+        parent.addFileToList()
+    }
+    parent.restartEditor()
 }
-
+    
 function loadProject() {
-  var pname = document.getElementById("lcontentpath").value
-  parent.openProject(pname, true)
-  parent.restartEditor()
+    var pname = document.getElementById("lcontentpath").value
+    parent.openProject(pname, true)
+    parent.restartEditor()
 }
 
 
 ipcRenderer.on("filelist", (event, data) => {
-  var jobj = JSON.parse(data);
-  jobj.target = 'lcontent';    
-  if(jobj.type == 'dirdata') {
-      fileList(jobj, 0);
-  }
+    var jobj = JSON.parse(data);
+    jobj.target = 'lcontent';    
+    if(jobj.type == 'dirdata') {
+        fileList(jobj, 0);
+    }
 });    
     
 

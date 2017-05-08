@@ -297,8 +297,7 @@ function clearDoc() {
 
 var project = undefined;
 
-function display(data)
-{       
+function display(data) {       
     editor.setTheme("ace/theme/" + config.theme.toLowerCase());  
     var fontSize = parseInt(config.fontSize);
     editor.setFontSize(fontSize);
@@ -395,13 +394,14 @@ var currentInProject = null;
 
 function addFileToCurrentProject(name) {    
     currentInProject=null;
-    config.project = name;
-    saveIni("aedit.ini.js")     
-    updateTooltip();
     if(indexInProject(AEditFileName) != -1) {
         alert("File already in the list!");
         return;
     }
+    config.project = name;
+    saveIni("aedit.ini.js")     
+    updateTooltip();
+
     project.list.push([AEditFileName, editor.getFirstVisibleRow()]);
     project.list.sort(function (a, b) {
       var af = extractFile(a[0]);
@@ -733,8 +733,7 @@ function act(element) {
 	editor.focus();
 }
 
-function changedStatus(status)
-{
+function changedStatus(status) {
 	var chg = document.getElementById("changed");
 	if(status)
 		chg.src="images/changed.png";
@@ -746,8 +745,7 @@ function changedStatus(status)
     
 ipcRenderer.on("interface", (event, data) => {
     var jobj = JSON.parse(data);
-    switch(jobj.type) 
-    {
+    switch(jobj.type) {
     case "openDoc":
         setActiveRow();
         if(aPanel.style.display=="block") {
@@ -854,8 +852,7 @@ function winload() {
 }
 
     
-function load()
-{
+function load() {
     var a = { 
 	    'command': 'getContent', 
 		'path': AEditFileName,
