@@ -117,14 +117,6 @@ Make use of:
     </div>
 </div> <!--main-->
     
-<dialog id="sDialog">
-  <menu>
-    <button onclick="sDialog.close(2)">Save</button>
-    <button onclick="sDialog.close(1)">Do not save</button>
-    <button onclick="sDialog.close(0)">Cancel</button>
-  </menu>
-</dialog>    
-    
 <script>
 const {dialog} = require('electron').remote   
 
@@ -287,7 +279,6 @@ function AESaveDialog(cb) {
         b0.onclick=function() { sDialog.close(0) }
         b0.innerHTML="Cancel"
         menu.appendChild(b0)
-        //alert(sDialog.innerHTML)
         sDialog.showModal();
         
         sDialog.addEventListener('close', function(e) {
@@ -574,7 +565,6 @@ function removeProject(name)  {
     }   
 }  
     
-    
 function setIna(elem) {
     elem.setAttribute("class", "prjIna");
 }
@@ -633,7 +623,6 @@ function prjCtxMenu(elem) {
 }
 
 /* Project end */
-   
     
 function preview(openflag) {
     var a = { 
@@ -874,8 +863,7 @@ function about() {
 	}
     lastPanel.style.display="none"    
     aPanel.style.display="block"
-}
-    
+}  
 
 function restartEditor() {
     if(ePanel != lastPanel) {
@@ -891,7 +879,7 @@ var AEditFileName = ""
 
 function winload() {
     var loader = document.getElementById("loader")
-    var fc = (loader.contentWindow || loader.contentDocument);
+    var fc = (loader.contentWindow || loader.contentDocument)
     lastPanel.style.display="none"
     aPanel.style.display="none"    
     lPanel.style.display="block"

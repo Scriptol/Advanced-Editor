@@ -1,4 +1,3 @@
-
 function Eratosthenes(element, top)
 {
   var all = new Uint8Array(new ArrayBuffer(top));

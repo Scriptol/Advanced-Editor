@@ -107,7 +107,7 @@
 	margin:0px;
 	background:black;
     color:white;
-	overflow:hidden;
+	overflow:scroll;
 }
 
 #prjlist p {
