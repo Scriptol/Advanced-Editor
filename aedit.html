@@ -372,6 +372,7 @@ function display(data) {
 /* Project Management */
 
 function getSource(filepath) {
+    if(lastPanel != ePanel) return
 	var a = { 
         'path' : filepath, 
         'command': 'getContent'

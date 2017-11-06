@@ -7,4 +7,4 @@ This source code editor is specially suited for switching frequently between sev
 
 Additionaly you can easily customize the editor thanks to the HTML + CSS interface and add function to the JavaScript code. 
 
-More infos on: http://www.scriptol.com/scripts/advanced-editor.php
+As of November 2017, the program is now called Cryonie Editor and available on : https://www.cryonie.com/
