@@ -1,0 +1,1442 @@
+<!--
+Advanced Editor (formerly Cryonie Editor) 
+(c) 2016-2026 Denis Sureau
+License Creative Common
+
+Make use of:
+* Ace Editor API, under the BSD Licence.
+* Tango public domain icons.
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">s    
+<title>Advanced Editor</title>
+<link type="text/css" href="code/aeditor.css" rel="stylesheet">
+<script src="src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="code/javascript-ini.js"></script>    
+<script src="aeditor.ini.js"></script>        
+</head>
+<body>
+<div id="toolbar">
+<div class="leftbar">
+<div class="imagebutton" id="loadButton">
+    <input type="file" id="load">
+    <img class="image" src="images/open.png" title="Load a file">
+</div>
+
+<div class="imagebutton" id="save" onClick="act(this)">
+    <img class="image" src="images/save.png" title="Save to file">
+</div>
+   
+<div class="imagebutton" id="new"  onClick="act(this)"><img class="image" src="images/new.png" alt="New blank page" title="New blank page"></div>
+<div class="imagebutton" id="find" onClick="act(this)"><img class="image" src="images/find.png" alt="Search" title="Search  CTRL-F"></div>
+<div class="imagebutton" id="replace" onClick="act(this)"><img class="image" src="images/replace.png" alt="Search & replace" title="Search & replace  CTRL-H"></div>
+
+<div class="imagebutton" id="go">
+    <div class="insert">
+        <img class="image" src="images/go.png" title="Go to location">
+        <span id="golist" class="comlist">
+        <h3>Go to...</h3>
+            <p id="top" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Top</p>   
+            <p id="bottom" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Bottom</p>
+        </span>    
+    </div>  
+</div> 
+
+<div class="buttonInput" id="buttonInput"  alt="Go to line" title="Go to line">
+   <input id="line" type="text" size="4" value="" onKeyUp="goline(this)">
+</div>
+
+<div class="imagebutton" id="outdent" onClick="act(this)"><img class="image" src="images/outdent.png" alt="Outdent" title="Unindent  SHIFT-TAB"></div>
+<div class="imagebutton" id="indent"  onClick="act(this)"><img class="image" src="images/indent.png" alt="Indent" title="Indent  TAB"></div>
+
+<div class="imagebutton" id="cutico">
+<div class="insert">
+  <img class="image" src="images/cut.png" alt="Cut/paste" title="Copy/Paste">
+  <span class="comlist">
+  <h3>Copy/Paste</h3>
+  <p id="cut"   class='ctxMenu' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Cut      CTRL-X</p>   
+  <p id="copy"  class='ctxMenu' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Copy     CTRL-C</p> 
+  <p id="paste" class='ctxMenu' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Paste    CTRL-V</p> 
+  </span>
+ </div>
+</div>    
+    
+<div class="imagebutton" id="undo"    onClick="act(this)"><img class="image" src="images/undo.png" alt="Undo" title="Undo  CTRL-Z"></div>
+<div class="imagebutton" id="redo"    onClick="act(this)"><img class="image" src="images/redo.png" alt="Redo" title="Redo  CTRL-Y"></div>
+<div class="imagebutton" id="insico">
+ <div class="insert">
+   <img class="image" src="images/insert.png" alt="Insert elements" title="Insert elements">
+  <span class="comlist">
+  <h3>Insert</h3>
+  <p id="comment" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>/* */</p>  
+  <p id="nocomment" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>No /* */</p>         
+  <p id="link" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Link</p>   
+  <p id="table" class='prjIna' title="" onmouseover='setAct(this)' onmouseout='setIna(this)' onclick='act(this)'>Table</p>         
+ </span>    
+ </div>  
+</div>    
+<div class="imagebutton" id="preview" onClick="act(this)">
+  <img src="images/preview.png" width="32" height="32" title="Preview document">
+</div>    
+<div class="imagebutton" id="about" onClick="act(this)">
+  <img src="images/help.png" id='thelp' width="32" height="32" title="About Advanced Editor">
+</div>
+</div>
+
+<div class="sideright">
+    <div class="tfield" id="filename"></div>
+    <div class="indicator"><img class="image" id="changed" src="images/saved.png" alt="Change status" title="On if modified"></div>
+    <div class="imagebutton" id='quit' onClick="act(this)"><img class="image" src="images/exit.png" alt="Exit" title="Save project and quit"></div>
+</div>
+
+</div> <!--toolbar-->
+
+<div id="main">
+    <div id="project">
+        <div id="prjbar">
+            <img class="pimage" id="addfolder" src="images/prjadd.png" title="Add folder to projects" 
+              onClick="addFolder()">
+            <img class="pimage" id="remfolder" src="images/prjrem.png" title="Remove current folder from list" 
+              onclick="removeFolder()">
+<!--
+            <img class="primage" id="closeFolder" src="images/prjexit.png" title="Close folder" 
+               onclick="closeFolder()">
+-->                             
+            <img class="primage" id="pickFolder" src="images/prjopen.png" title="Create a project" 
+               onclick="createProject()">
+        </div>
+        <div id="folderPathDiv">
+            <input type="text" id="folderPath" value="C:/">
+            <span id="folderArrow" onClick="openFolder()" >➤</span>
+        </div>
+     
+        <div class="tabs">
+            <div class="tab active" data-target="prjlist" id="filesTab">Files</div>
+            <div class="tab" data-target="allProjects" id="prjTab">Projects</div>
+        </div>  
+        <div id="prjlist" class="content active">
+        </div>  
+        <div id="allProjects" class="content">
+        </div>   
+    </div>  
+    <div id="resizer"></div> 
+    <div id="panels">
+        <div id="epanel">
+            <div id="editor"></div>
+            <div id="statusbar">
+                <div id="statustext"></div>
+            </div>
+        </div>
+        <div id="opanel">
+            <iframe id="options" src="settings.html" width="640" height="500"></iframe>
+        </div>
+        <div id="apanel">
+            <iframe id="manual" src="manual.html" width="640" height="500"></iframe>
+        </div>   
+    </div>    
+</div> <!--main-->
+    
+<script>
+
+const resizer = document.getElementById('resizer');
+const sidebar = document.getElementById('project');
+
+resizer.addEventListener('mousedown', function(e) {
+    e.preventDefault();
+    
+    document.addEventListener('mousemove', resize);
+    document.addEventListener('mouseup', stopResize);
+    
+    document.body.style.cursor = 'col-resize';
+});
+
+function resize(e) {
+    const newWidth = e.clientX;
+   
+    if (newWidth > 200 && newWidth < 400) {
+        sidebar.style.width = newWidth + 'px';
+    }
+}
+
+function stopResize() {
+    document.removeEventListener('mousemove', resize);
+    document.removeEventListener('mouseup', stopResize);
+    document.body.style.cursor = 'default';
+    localStorage.setItem('sidebarWidth', sidebar.offsetWidth);    
+}
+
+// server access
+
+const socket = new WebSocket('ws://localhost:8080');
+let projects = []
+let DRIVES = []
+
+function sendFromInterface(obj) {
+    if (!socket) {
+        console.error("WebSocket non initialisé");
+        return;
+    }
+
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify(obj));
+        return;
+    }
+
+    if (socket.readyState === WebSocket.CONNECTING) {
+        console.log("WebSocket → waiting…");
+
+        socket.addEventListener("open", () => {
+            socket.send(JSON.stringify(obj));
+        }, { once: true });
+        return;
+    }
+
+    console.error("WebSocket non disponible, état =", socket.readyState);
+}
+
+
+var aPanel = document.getElementById("apanel")
+var ePanel = document.getElementById("epanel")
+var oPanel = document.getElementById("opanel")
+    
+var contentToSave = false;
+var editor = ace.edit("editor");
+var rootdir;
+var saveMode = 0;      // 0 = file
+
+    
+var languageExt = {
+  "c": "c_cpp",
+  "cpp": "c_cpp",
+  "cs": "csharp",  
+  "css": "css",
+  "go": "golang",  
+  "h": "c_cpp",
+  "hpp": "c_cpp",  
+  "ini": "ini",
+  "java": "java",
+  "jl": "julia",
+  "js": "javascript",
+  "json": "json",
+  "html": "html",
+  "php": "php",  
+  "rss": "xml",
+  "svg": "svg",      
+  "py": "python",
+  "rb": "ruby",
+  "rs": "rust",  
+  "sol": "scriptol",    
+  "sql": "sql",  
+  "txt": "plain_text",                
+  "xml": "xml"  
+};
+    
+
+// TABS
+
+const tabs = document.querySelectorAll(".tab");
+const contents = document.querySelectorAll(".content");
+
+tabs.forEach(tab => {
+    tab.addEventListener("click", () => {
+        tabs.forEach(t => t.classList.remove("active"));
+        contents.forEach(c => c.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById(tab.dataset.target).classList.add("active");
+    });
+});
+
+// LOADING SYSTEM
+
+document.getElementById('loadButton').addEventListener('click', () => { 
+    if(contentToSave) {
+        AEFileDialog('Save', function(result, name) {
+            if(result)
+                document.getElementById('load').click();
+        });  
+    }
+    else {
+        document.getElementById('load').click();
+    }
+});
+
+document.getElementById('load').addEventListener('change', async (event) => {
+    const files = event.target.files
+    if (!files || files.length === 0) return;
+    const file = files[0];
+
+    const extension = file.name.split('.').pop().toLowerCase();
+    const reader = new FileReader();
+    reader.onload = () => {
+        const content = reader.result;
+        setActiveRow(); 
+        if(aPanel.style.display=="block") {
+            aPanel.style.display="none"    
+            ePanel.style.display="block"    
+        }
+        editDoc({
+            "filename": file.name,
+            "content": content
+        })
+        return
+    };
+    reader.readAsText(file);
+});
+
+
+// OPEN FOLDER BUTTON
+   
+async function createProject() {
+    if (contentToSave) {
+        AEFileDialog('Save', (result) => {
+            if (result === false) return;
+        });
+    }
+
+    AEFileDialog('Open', (result, folder) => {
+        //if (result === false) return;
+        //document.getElementById('folderPath').value = folder
+        //openFolder()
+        return;
+    });
+}
+    
+
+async function openFolder() {
+    const path = document.getElementById('folderPath').value;
+    if (!path) {
+        alert("No path given to open");
+        return;
+    }
+    socket.send(JSON.stringify({
+        type: 'LIST_FOLDER',
+        path: path 
+    }));
+    config.folder = path;
+}
+
+function goToParent() {
+    const pathInput = document.getElementById('folderPath');
+    let currentPath = pathInput.value.trim();
+    const parts = currentPath.split(/[/\\]/);
+    if (parts.length > 1) {
+        parts.pop(); // remove last part of the path
+        pathInput.value = parts.join('/');
+        openFolder();
+    }
+}
+
+    // Folder display
+
+let isDriveInProject = false
+function driveForProjects(drive) {
+        const item = document.createElement("div");
+        item.className="driveEntry"
+
+        const icon = document.createElement("span");
+        icon.innerHTML = "&#128436;"; // 🖴 
+        icon.style.cssText = `font-size: 1.1em; opacity: 0.9;margin-top:-5px`;
+
+        const label = document.createElement("span");
+        label.textContent = drive;
+
+        item.appendChild(icon);
+        item.appendChild(label);
+
+        item.onmouseenter = () => item.style.background = "#555";
+        item.onmouseleave = () => item.style.background = "#000";
+
+        item.onclick = () => {
+            isDriveInProject = false;  
+            currentPath = drive + "/";
+            document.getElementById('folderPath').value = currentPath;
+            openFolder()
+        };
+
+        return item;
+}    
+  
+
+function displayFiles(files) {
+    const pathInput = document.getElementById('folderPath');
+    const listContainer = document.getElementById('prjlist');
+    listContainer.innerHTML = ''; 
+
+    if (isDriveInProject) {
+            DRIVES.forEach(drive => {
+            const btn = driveForProjects(drive);
+            listContainer.appendChild(btn);
+        });
+        isDriveInProject = false;
+        return; 
+    } 
+
+    if(files == undefined || files.length == 0) return;
+
+    // Up directory
+    const parentItem = document.createElement('p');
+    parentItem.className = 'prjIna';
+    parentItem.innerHTML = '<span>⬅️</span> ..';
+    listContainer.appendChild(parentItem);
+    
+    parentItem.onclick = function() {
+        let currentPath = pathInput.value.trim();
+        if (/^[a-zA-Z]:\/?$/.test(currentPath)) {
+            if (!currentPath.endsWith("/")) {
+                currentPath += "/";
+            }
+            isDriveInProject = true;
+            displayFiles({ files: [] });
+            return;                    
+        }         
+        const parts = currentPath.split(/[/\\]/);
+        if (parts.length > 1) {
+            parts.pop(); // remove last part of the path
+            pathInput.value = parts.join('/');
+            openFolder();
+        }
+    };
+
+    files.sort((a, b) => {
+        if (a.isDirectory && !b.isDirectory) return -1;
+        if (!a.isDirectory && b.isDirectory) return 1;
+        return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+    });    
+
+    files.forEach(file => {
+        const item = document.createElement('p');
+        item.className = 'prjIna';
+
+        const icon = document.createElement('span');
+        icon.style.marginRight = '8px'; // Petit espace entre l'icône et le texte
+        icon.textContent = file.isDirectory ? '📁' : '📄';
+        item.appendChild(icon);
+        item.appendChild(document.createTextNode(file.name));
+
+        item.onmouseover = function() { this.className = 'prjAct'; };
+        item.onmouseout = function() { this.className = 'prjIna'; };
+        
+        item.onclick = function() {
+            let currentPath = pathInput.value.trim();
+            if (currentPath && !currentPath.endsWith('/') && !currentPath.endsWith('\\')) {
+                currentPath += '/';
+            }            
+            const newPath = currentPath + file.name;
+
+            if (file.isDirectory) {
+                pathInput.value = newPath;
+                openFolder(); 
+            } else {
+                setActiveRow(); 
+                if(aPanel.style.display == "block") {
+                    aPanel.style.display = "none";
+                    ePanel.style.display = "block";
+                }
+                //alert("load " + newPath)
+                getSource(newPath);
+            }
+        };
+
+        listContainer.appendChild(item);
+    });
+}
+
+// Project management
+
+function addEntry(folder, lastFile) {
+    const plist = document.getElementById("allProjects");
+    const p = document.createElement("p");
+    p.textContent = folder;
+    p.dataset.cache = lastFile;
+    plist.appendChild(p);
+}
+
+
+function buildProjectTab() {
+    let pair = []
+    document.getElementById("allProjects").innerHTML = ""
+    for (pair of projects) {
+        addEntry(pair[0], pair[1])
+    }
+}
+
+
+function openProject(path) {
+    if(contentToSave) {
+        AEFileDialog('save', function(result, name) {
+            if(result == false) {
+                return
+            }
+        }); 
+    }           
+    document.getElementById('folderPath').value = path;    
+    openFolder()
+    openActive()
+}
+
+document.getElementById("allProjects").addEventListener("click", (e) => {
+    if (e.target.tagName === "P") {
+        const folder = e.target.textContent;
+        //const active = e.target.dataset.cache;
+        //openProject(folder, active);
+        openProject(folder);
+        showFiles()
+    }
+});
+ 
+function addFolder() {
+    const path = document.getElementById('folderPath').value;  
+    if(path == "") return
+    if(path.at(-1) !== "/")   path += "/"
+    const index = projects.findIndex(paire => paire[0].toLowerCase() === path.toLowerCase());
+    if(index !== -1) return    
+
+    const pair = [path, AEditFileName]
+    if(projects.length==0) {
+        projects[0] = pair
+        buildProjectTab()        
+        return
+    }
+    const key = path.toLowerCase();
+    let i = 0;
+    while (i < projects.length && projects[i][0].toLowerCase() < key) {
+        i++;
+    }
+    projects.splice(i, 0, pair);
+    buildProjectTab()
+}
+
+function removeFolder() {
+    const path = document.getElementById('folderPath').value;
+    if(path == "") return false;
+    const index = projects.findIndex(paire => paire[0] === path);
+    if (index !== -1) {
+        projects.splice(index, 1);
+        buildProjectTab()
+        return true; 
+    }
+    return false;             
+}
+
+// switch tab
+
+function showFiles() {
+    const filesTab = document.getElementById("filesTab");
+    const prjTab = document.getElementById("prjTab");
+    const prjlist = document.getElementById("prjlist");
+    const allProjects = document.getElementById("allProjects");
+
+    filesTab.classList.add("active");
+    prjTab.classList.remove("active");
+    prjlist.classList.add("active");
+    allProjects.classList.remove("active");    
+}
+
+editor.setTheme("ace/theme/dreamweaver");
+editor.getSession().setMode("ace/mode/html"); 
+editor.getSession().on('change', function() { 
+    if(contentToSave == false)
+       changedStatus(true);
+    }
+);
+		
+editor.commands.addCommand({
+    	name: 'saving',
+    	bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
+    	exec: function(editor) { 
+            save(false);  
+            changedStatus(false)            
+        }
+	},{
+    name: "find",
+    bindKey: {win: "Ctrl-F", mac: "Command-F"},
+    exec: function(editor, needle) {
+        if (typeof needle == "object") {
+            var arg = this.name + " " + editor.getCopyText()
+            editor.cmdLine.setValue(arg, 1)
+            editor.cmdLine.focus()
+            return
+        }
+        editor.find(needle);
+    	}
+	},{
+    name: "gotoline",
+    bindKey: {win: "Ctrl-L", mac: "Command-L"},
+    exec: function(editor, line) {
+        if (typeof line == "object") {
+            var arg = this.name + " " + editor.getCursorPosition().row;
+            editor.cmdLine.setValue(arg, 1)
+            editor.cmdLine.focus()
+            return
+        }
+        line = parseInt(line, 10);
+        if (!isNaN(line))
+            editor.gotoLine(line);
+    	}
+	}
+	);	
+    
+  
+function getActiveRow() {
+    let pos = editor.getCursorPosition()
+    config.row = pos["row"]
+}
+
+function setActiveRow() {     
+    let row = config.row
+    if(row != undefined && row >=0) {
+        editor.scrollToRow(row);
+    }
+} 
+
+
+function closeTooltip(element) {
+  element.style.display="none"  
+}    
+
+function updateStatusBar(message) {
+    document.getElementById('statustext').innerHTML = message;
+}
+  
+    
+function getFileNode() {
+    var fname = AEditFileName;    
+    if(fname === undefined) return "";
+    if(fname !="") {
+        var pos = fname.lastIndexOf("/");
+        if(pos == -1) pos = fname.lastIndexOf("\\");
+        if(pos > 0) fname = fname.substr(pos + 1);
+    }
+    return fname;
+}    
+    
+function displayFileName() {
+    var fname = getFileNode()
+    var fno =  document.getElementById("filename")    
+    fno.innerHTML = fname;
+    fno.setAttribute("title", AEditFileName);
+    fno.setAttribute("class", "tfield")
+}
+
+
+/**
+ * @param {string} mode - 'save' ou 'load'
+ * @param {function} cb - Callback(success, path, content)
+ */
+function AEFileDialog(mode, cb) {
+    let isSaveMode = false;
+    let isDriveListMode = false;
+    let currentPath = document.getElementById('folderPath').value || '.';
+    let title = ""
+    switch(mode) {
+        case "Open":
+            title="Load a file and make a project"
+            break;
+        case "Save":
+            title="Save as..."
+            isSaveMode = true
+            break;
+        default:
+            title = "Load File"
+            break;
+    }
+
+    const sDialog = document.createElement("dialog");
+    sDialog.style.cssText = `
+        width: 450px; 
+        border-radius: 8px; 
+        border: 1px solid #888; 
+        padding: 20px; 
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        font-family: sans-serif;
+        background: #333;
+        color:white;
+    `;
+
+    sDialog.innerHTML = `
+        <h3 style="margin-top:0;">${title}</h3>
+        <span id="pathDisplay" style="fontWeight:"bold;margin-bottom:8px;">
+            ${currentPath}
+        </span>    
+    `;
+
+    function displayDrive(drive) {
+        const item = document.createElement("div");
+        item.className="driveEntry"
+
+        const icon = document.createElement("span");
+        icon.innerHTML = "&#128436;"; // 🖴 
+        icon.style.cssText = `font-size: 1.1em; opacity: 0.9;margin-top:-5px`;
+
+        const label = document.createElement("span");
+        label.textContent = drive;
+
+        item.appendChild(icon);
+        item.appendChild(label);
+
+        item.onmouseenter = () => item.style.background = "#555";
+        item.onmouseleave = () => item.style.background = "#000";
+
+        item.onclick = () => {
+            isDriveListMode = false;  
+            currentPath = drive + "/";
+            document.getElementById("pathDisplay").textContent = currentPath;
+
+            socket.send(JSON.stringify({
+                type: "DIALOG_FILES",
+                path: currentPath
+            }));
+        };
+
+        return item;
+    }    
+    
+    const listContainer = document.createElement("div");
+    listContainer.style.cssText = `
+    z-index:1;
+    border: 1px solid #ccc;
+    height: 180px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    padding: 5px;
+    position:relative;
+    `;
+    
+    const nameInput = document.createElement("input");
+    nameInput.type = "text";
+    nameInput.placeholder = "Filename...";
+    nameInput.style.cssText = `
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    background:black;
+    color:white;
+    `;    
+    
+    if (isSaveMode && typeof AEditFileName !== 'undefined' && AEditFileName !== "") {
+        nameInput.value = extractFile(AEditFileName);
+    }
+
+    const footer = document.createElement("div");
+    footer.style.textAlign = "right";
+
+    const btnCancel = document.createElement("button");
+    btnCancel.innerText = "Cancel";
+    btnCancel.style.cssText = "padding: 7px 15px; margin-right:10px; cursor: pointer; background: #666; color: white; border: none; border-radius: 4px;";
+
+    const btnIgnore = document.createElement("button");
+    btnIgnore.innerText = "Ignore";
+    btnIgnore.style.cssText = "padding: 7px 15px; margin-right:16px; cursor: pointer; background: #666; color: white; border: none; border-radius: 4px; font-weight: bold;";
+
+    const btnAction = document.createElement("button");
+    btnAction.innerText = mode;
+    btnAction.style.cssText = `padding: 7px 15px; cursor: pointer; background: ${isSaveMode ? '#28a745' : '#007bff'}; color: white; border: none; border-radius: 4px; font-weight: bold;`;
+
+    sDialog.appendChild(listContainer);
+    sDialog.appendChild(nameInput);
+    footer.appendChild(btnCancel);
+    if(isSaveMode) {
+        footer.appendChild(btnIgnore);    
+    }
+    footer.appendChild(btnAction);
+    sDialog.appendChild(footer);
+
+    document.body.appendChild(sDialog);
+
+    sDialog.showModal();
+
+    const refreshFileList = (data) => {
+        listContainer.innerHTML = "";
+        document.getElementById('pathDisplay').innerText = currentPath;
+
+        // drives here
+        if (currentPath !== "." && !currentPath.endsWith("/")) {
+            currentPath += "/";
+        }
+
+        if (isDriveListMode) {
+                listContainer.innerHTML = "";
+                DRIVES.forEach(drive => {
+                const btn = displayDrive(drive);
+                listContainer.appendChild(btn);
+            });
+            isDriveListMode = false;
+            return; 
+        }                
+
+        const up = document.createElement("div");
+        up.innerHTML = '<span>⬅️</span> ..';
+        up.style.cssText = "padding: 4px; cursor: pointer; color: white;";
+
+        up.onclick = () => {
+                if (/^[a-zA-Z]:\/?$/.test(currentPath)) {
+                    if (!currentPath.endsWith("/")) {
+                        currentPath += "/";
+                    }
+                    isDriveListMode = true;
+                    refreshFileList({ files: [] });
+                    return;                    
+                } 
+                else {
+                    let parts = currentPath.split('/').filter(p => p && p !== ".");
+                    if (parts.length > 0) {
+                    parts.pop();
+                    if (parts.length === 1 && /^[a-zA-Z]:$/.test(parts[0])) {
+                        currentPath = parts[0] + "/";
+                    } 
+                    else if (parts.length > 0) {
+                        currentPath = parts.join('/');
+                    } 
+                    else {
+                        currentPath = ".";
+                    }
+                }
+
+                if (currentPath !== "." && !currentPath.endsWith("/")) {
+                    currentPath += "/";
+                }
+                
+                //alert(currentPath)
+                socket.send(JSON.stringify({ 
+                    type: 'DIALOG_FILES', 
+                    path: currentPath 
+                }));
+            }
+        };
+
+        listContainer.appendChild(up);
+        let files = data.files
+        files.sort((a, b) => {
+            if (a.isDirectory && !b.isDirectory) return -1;
+            if (!a.isDirectory && b.isDirectory) return 1;
+            return a.name.localeCompare(b.name, undefined, { sensitivity: 'base' });
+        });           
+
+        files.forEach(file => {
+            const item = document.createElement("div");
+            item.style.cssText = "padding: 4px; cursor: pointer; font-size: 0.9em; border-bottom: 1px solid #444;";
+            const icon = file.isDirectory ? "&#128193;" : "&#128196;";
+            item.innerHTML = `<span style="color: ${file.isDirectory ? '#f39c12' : '#7f8c8d'};">${icon}</span> ${file.name}`;
+
+            item.onclick = () => {
+                if (file.isDirectory) {
+                    let base = (currentPath === ".") ? "" : currentPath;
+                    if (base !== "" && !base.endsWith("/")) base += "/";
+                    currentPath = base + file.name;
+                    socket.send(JSON.stringify({ type: 'DIALOG_FILES', path: currentPath }));
+                } else {
+                    nameInput.value = file.name;
+                }
+            };
+            listContainer.appendChild(item);
+        });
+    };
+
+    const messageHandler = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+            
+            if (data.type === 'FILE_LIST') {
+                refreshFileList(data);
+            } 
+            else if (data.type === 'SAVE_SUCCESS' && isSaveMode) {
+                changedStatus(false);
+                const sep = (currentPath == "." || currentPath.at(-1) == "/") ? "" : "/" 
+                AEditFileName = currentPath + sep + nameInput.value;
+                displayFileName();
+                if(currentPath ===  document.getElementById('folderPath').value) {
+                    openFolder()
+                }
+                sDialog.close();
+                if(cb) cb(true, AEditFileName);
+            } 
+            else if (data.type === 'FILE_CONTENT' && !isSaveMode) {
+                const sep = (currentPath == "." || currentPath.at(-1) == "/") ? "" : "/" 
+                AEditFileName = currentPath + sep + nameInput.value;
+                editor.setValue(data.content); // replace content
+                displayFileName();
+                changedStatus(false);
+                document.getElementById('folderPath').value = currentPath;
+                openFolder()
+                addFolder()
+                sDialog.close();
+                if(cb) cb(true, AEditFileName, data.content);
+            }
+            else if (data.type === 'ERROR') {
+                alert("Error: " + data.message);
+            }
+        } catch (e) { console.error(e); }
+    };
+
+    socket.addEventListener('message', messageHandler);
+    socket.send(JSON.stringify({ 
+        type: 'DIALOG_FILES', 
+        path: currentPath 
+    }));
+
+    btnAction.onclick = () => {
+        const fname = nameInput.value.trim();
+        if (!fname) return nameInput.focus();
+        if(currentPath.at(-1) != "/") currentPath += "/"
+
+        if (isSaveMode) { 
+            socket.send(JSON.stringify({
+                type: 'SAVE_DOC',
+                filename: currentPath + "/" + fname,
+                content: editor.getValue()
+            }));
+        } 
+        else  { // Open
+            socket.send(JSON.stringify({
+                type: 'GET_CONTENT',
+                path: currentPath + "/" + fname,
+            }));
+            openProject(currentPath)
+            addFolder()
+        }
+        if(cb) cb(true, "")
+        sDialog.close();
+    };
+
+    btnCancel.onclick = () => {
+        if(cb) cb(false, "");
+        sDialog.close();
+    };
+
+    btnIgnore.onclick = () => {
+        if(cb) cb(true, "")
+        sDialog.close();
+    }        
+
+    sDialog.onclose = () => {
+        socket.removeEventListener('message', messageHandler);
+        sDialog.remove(); 
+    };
+}
+
+
+function newDoc() {
+    editor.session.setValue("");
+    AEditFileName = "";
+    displayFileName();
+    updateStatusBar("");    
+    restartEditor();      
+    changedStatus(false);    
+}
+
+function clearDoc() {
+    if(!contentToSave) {
+        newDoc();
+        return
+    }
+    AEFileDialog('Save', function(result, name) {
+        if(result == true) {
+            newDoc();
+        }
+    });
+    return 
+}
+
+
+function display(data) {       
+    editor.setTheme("ace/theme/" + config.theme.toLowerCase());  
+    var fontSize = parseInt(config.fontSize);
+    editor.setFontSize(fontSize);
+    editor.setShowPrintMargin(false);
+    editor.getSession().setTabSize(4);
+    editor.getSession().setUseWrapMode(true);
+    
+    if(data != null && data.content != null) {
+        setActiveRow();
+        editor.session.setValue(data.content, -1);
+        var mode = "plain_text";
+        if(data.ext in languageExt)   
+        mode = "ace/mode/" + languageExt[data.ext];
+        editor.getSession().setMode(mode);    
+        AEditFileName = data.filename;
+        displayFileName();
+        changedStatus(false);
+        updateStatusBar(AEditFileName);
+    }
+    editor.focus();
+}
+
+// PATH
+    
+function extractDir(fullpath) {
+    if(fullpath===undefined) return ""
+    var p1 = fullpath.lastIndexOf("/");
+    var p2 = fullpath.lastIndexOf("\\");
+    if(p2 > p1) p1 = p2;
+    return fullpath.substr(0, p1 + 1);
+}
+
+function extractFile(fullpath) {
+    if(fullpath===undefined) return ""
+    var p1 = fullpath.lastIndexOf("/");
+    var p2 = fullpath.lastIndexOf("\\");
+    if(p2 > p1) p1 = p2;
+    return fullpath.substr(p1 + 1);
+} 
+    
+function extractNode(fname) {
+    var p = fname.lastIndexOf(".")
+    if(p == -1) p = fname.length
+    return fname.substr(0, p)
+}
+
+
+
+function getSource(filepath) {
+    if(lastPanel != ePanel) return    
+    if (contentToSave) {
+        if (!confirm("Content not saved. Continue ?")) {
+            origin = AEditFileName;
+			save(true);
+        }
+    }
+
+    var a = { 
+        'path' : filepath, 
+        'type': 'GET_CONTENT'
+    };
+    sendFromInterface(a);
+}
+    
+
+function canonicalPath(s){
+    s = s.replace(/\\\\/g, '/');    
+    return s.replace(/\\/g, '/');
+}    
+    
+    
+function setIna(elem) {
+    elem.setAttribute("class", "prjIna");
+}
+    
+function setAct(elem) {
+    elem.setAttribute("class", "prjAct");
+}     
+ 
+    
+function preview(openflag) {
+    var content = editor.getValue();
+    if(content.length == 0) return;     
+    const blob = new Blob([content], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+}    
+    
+
+var lst=null;  
+function goline(element) {
+    if(lst != null) clearTimeout(lst);
+    lst=setTimeout(function() {
+        var lnum = element.value;
+        element.value="";
+        editor.gotoLine(lnum,0);
+    }, 1500);
+}
+
+
+function quitSub() {
+    saveConfig("aeditor.ini.js")
+    setTimeout(function() { this.close();}, 100);
+    sendFromInterface({ 'type': 'QUIT' });
+}    
+    
+function quit() {
+    if(!contentToSave) {
+        quitSub();
+        return
+    }
+    AEFileDialog('Save', function(result, name) {
+        if(result) {
+            contentToSave=false
+            quitSub();
+        }
+    });
+    return 
+}    
+
+/* Shell */
+
+window.act = act;
+window.setAct = setAct;
+window.setIna = setIna;
+window.goline = goline;
+window.quit = quit;
+
+var origin;
+function act(element) {
+	var command = element.id;
+	var temp;
+	switch(command) {
+		case "new":	      
+            clearDoc();	
+            break;
+		case "indent":		
+            editor.indent();	
+            break;	
+		case "outdent":		
+            editor.blockOutdent();	
+            break;					
+		case "cut": 
+			editorMyClipboard = editor.getCopyText();
+			editor.remove(); 
+			break;	
+		case "copy":	
+		    editorMyClipboard = editor.getCopyText();
+		    break;	
+		case "paste":
+		    editor.insert(editorMyClipboard);
+		    break;	
+		case "set":
+		case "clear":
+			break;
+		case "save":
+            origin = AEditFileName;
+			save(true);
+			break;
+		case "find":
+            editor.execCommand("find")
+			break;
+        case "replace":
+            editor.execCommand("replace")
+            break;
+		case "next":	
+			editor.findNext();
+			break;
+        case "top":
+            editor.gotoLine(0,0)
+            break;  
+        case "bottom":
+            editor.gotoLine(99990,0)
+            break; 
+		case "comment":
+			var current = editor.session.getTextRange(editor.getSelectionRange());
+            const cpos = editor.getCursorPosition()
+            let col = cpos.column + 2
+            if(current=="") {
+                current = " "
+                col++
+            }
+            temp = "/*" + current + "*/";	
+			editor.remove();
+			editor.insert(temp);	
+            editor.moveCursorTo(cpos.row,col);
+			break;  
+        case "nocomment":
+            var xy = editor.getCursorPosition()
+            editor.find("*/", {start: xy})
+            editor.replace("")
+            editor.find("/*", {start: xy, backwards:true})
+            editor.replace("")
+            break;
+		case "link":
+			var current = editor.session.getTextRange(editor.getSelectionRange());
+			temp = "<a href=''>" + current + "</a>";	
+			editor.remove();
+			editor.insert(temp);	
+			break;            
+		case "table":
+			buildtable(editor);
+			break;
+		case "undo":
+			editor.undo();
+			break;	
+		case "redo":
+			editor.redo();
+			break;	
+        case "preview":
+            preview(true);
+            break;
+        case "about":
+            about()
+            break;
+		case "quit":
+			quit();
+			break;	
+		default:
+			alert("Unknown command " +command);
+	}			
+	editor.focus();
+}
+
+function changedStatus(status) {
+	var chg = document.getElementById("changed");
+	if(status)
+		chg.src="images/changed.png";
+	else
+		chg.src="images/saved.png";		
+    contentToSave = status;  
+}
+    
+ 
+        
+var incflag=false
+function editDoc(jobj) {
+    editor.session.setValue(jobj.content, -1);
+    AEditFileName = jobj.filename
+    displayFileName();
+
+    var mode = "plain_text";
+    if(jobj.ext in languageExt) {  
+        mode = "ace/mode/" + languageExt[jobj.ext];
+    }
+    editor.getSession().setMode(mode); 
+    var row = getActiveRow();   
+    editor.scrollToLine(row);
+    changedStatus(false);
+    config.dir=extractDir(AEditFileName);
+    config.active=AEditFileName
+    const index = config.projects.findIndex(p => p[0] === config.folder);
+    if (index !== -1) {
+        config.projects[index][1] = AEditFileName;
+    }    
+
+    //saveIni();          
+    editor.focus(); 
+}
+
+function openActive() {
+    const index = config.projects.findIndex(p => p[0] === config.folder);
+    if(index == -1) return false
+    const fname = config.projects[index][1]
+    if(fname == undefined || fname == "") return false
+    getSource(fname)
+    return true
+}
+    
+socket.onmessage = (event) => {
+    var jobj = JSON.parse(event.data);
+    switch(jobj.type) {
+    case 'directory-list':
+        displayFiles(jobj.files);
+        showFiles()
+        openActive()
+        break;
+    case "openDoc":    
+        setActiveRow(); 
+        if(aPanel.style.display=="block") {
+            aPanel.style.display="none"    
+            ePanel.style.display="block"    
+        }
+        if(!contentToSave) {
+            editDoc(jobj)
+            return
+        } 
+        // ask to cancel or replace, save before or not
+        AEFileDialog('Save', function(result, name) {
+            if(result) editDoc(jobj)
+            return
+        });
+        break
+    case "message": 
+        alert(jobj.content)   
+        break;
+    case "notification":
+    case "mouse":
+        break;  
+    case "status":  
+        updateStatusBar(jobj.content);   
+        break;    
+    case "saved":
+        displayFileName();
+        changedStatus(false);   
+        break;
+    case "ASK_MKDIR":
+        const reponse = confirm(` "${jobj.dir}" missing. Create it ?`);
+        if (reponse) {
+            socket.send(JSON.stringify({ 
+                type: 'MAKE_DIR' 
+            }));
+        }            
+        break;
+    case "DRIVE_LIST":
+        DRIVES = jobj.drives
+        break;        
+    case "SAVED":
+        changedStatus(false);
+        break;
+    case "SAVE_SUCCESS":        
+    case "FILE_LIST":
+    case "ERROR":        
+        break
+    default:
+        alert("Unknow message: " + jobj.type);
+        break;    
+    }
+}
+
+var lastPanel;
+    
+function about() {
+	if(aPanel.style.display == "block") {
+    	lastPanel.style.display="block"    
+    	aPanel.style.display="none"
+		return;
+	}
+    lastPanel.style.display="none"    
+    aPanel.style.display="block"
+}  
+
+function restartEditor() {
+    if(ePanel != lastPanel) {
+        lastPanel.style.display="none"    
+        ePanel.style.display="block"
+        lastPanel = ePanel    
+    }
+    editor.focus();
+}
+
+var AEditSyncPath = undefined
+var AEditFileName = ""
+
+async function listDirectory(dirHandle, container) {
+  container.innerHTML = ""; // clear previous listing
+
+  for await (const entry of dirHandle.values()) {
+    const item = document.createElement("div");
+    item.style.cursor = "pointer";
+
+    if (entry.kind === "directory") {
+      item.textContent = "📁 " + entry.name;
+
+      item.onclick = async () => {
+        await listDirectory(entry, container);
+      };
+
+    } else if (entry.kind === "file") {
+      item.textContent = "📄 " + entry.name;
+
+      item.onclick = async () => {
+        const file = await entry.getFile();
+        const text = await file.text();
+        document.getElementById("content").textContent =
+          `File: ${file.name}\n\n${text}`;
+      };
+    }
+
+    container.appendChild(item);
+  }
+}
+
+   
+
+// I/O    
+
+function option() {
+    lastPanel = opanel
+}
+
+function getExtension(fname) {
+    if(fname !== undefined && fname != "") {
+        var pos = fname.lastIndexOf(".")
+        if(pos > 0) return fname.substr(pos)
+    }
+    return ""
+}    
+
+var winsave = function() {
+    AEFileDialog('Save', function(result, name) {
+        if(result) {
+            editor.focus();
+            return result
+        }
+        else {
+            return ""
+        }
+    });    
+}
+    
+
+
+function save(winflag) {
+    if(editor.getValue().length == 0) return; 
+    const nflag = AEditFileName == undefined || AEditFileName == "";
+    if(winflag || nflag)  { 
+        var x = winsave() 
+        if(x != "")  {
+            AEditFileName = x;
+        }    
+        return
+    }
+    editor.focus();
+    setActiveRow();
+    let content = editor.getValue();
+    if(content.length == 0) return; 
+    let a = { 
+        'type': 'SAVE_DOC',
+        'filename': AEditFileName,
+        'content': content        
+    };
+    sendFromInterface(a);         
+}   
+
+
+function buildtable(editor) {
+    var rows = 6;
+    var cols = 4;
+    if(rows > 0 && cols > 0) {
+		var table = "<table><tbody>\n";
+        table += "<thead><tr>";
+		for (var j=0; j < cols; j++) {
+            table += "<th></th>";
+		}
+		table += "</tr></thead>\n";
+        table += "<tbody>\n";
+		for (var i=1; i < rows; i++) {
+			table += "<tr>";
+			for (var j=0; j < cols; j++) {
+				table += "<td></td>";
+			}
+			table += "</tr>\n";
+		}
+		table += "<tbody></table>\n";
+		editor.insert(table);   
+	}	
+}
+
+window.addEventListener('beforeunload', function(event) {
+    if(contentToSave) {
+        var r = confirm('Content not saved. Exit anyway?')
+        if(r) { 
+            this.close()
+        }
+        else {
+            return event.returnValue = 'No'
+        }
+    }
+});
+    
+
+window.onload=function() {
+    lastPanel = document.getElementById("epanel"); 
+    const savedWidth = localStorage.getItem('sidebarWidth');
+    if (savedWidth) {
+        sidebar.style.width = savedWidth + 'px';
+    }    
+
+    display(null);
+    rootdir = config.dir
+    projects = config.projects
+    //document.getElementById('folderPath').value = localStorage.getItem('lastFolder') || '';
+    document.getElementById('folderPath').value = config.folder || '';
+    buildProjectTab()
+    openFolder()
+    if( !openActive()) {
+        if(config.active != undefined && config.active != "") {
+            getSource(config.active)
+        }
+    }
+}
+
+</script>
+
+</body>
+</html>

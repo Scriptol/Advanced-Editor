@@ -1,0 +1,14 @@
+{
+  "name": "advanced-editor-web",
+  "version": "1.0.0",
+  "description": "Version Web de Advanced Editor avec Node.js et WebSockets",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ws": "^8.0.0"
+  },
+  "author": "Denis Sureau",
+  "license": "GPL-3.0"
+}

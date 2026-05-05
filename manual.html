@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset=utf-8>
+<title>Advanced Editor Manual</title>
+<style>
+body {
+	padding:0 16px 8px 16px;
+}
+p img
+{
+	float:left;
+	margin:2px 8px 8px 8px;
+}
+h3 {
+	border-bottom:1px solid black;
+	clear:both;
+	margin-top:32px;
+}
+h4 {
+	clear:both;
+	margin-top:16px;
+}
+.insert {
+	float:none;
+	margin:0;
+}
+</style>
+</head>
+
+<body>
+<h1>Advanced Editor Manual</h1>
+ <p>Version 3.2 -  By Denis Sureau </p>
+
+ <h3>Icons</h3>
+<p>The purpose of each button is displayed in a tooltip when the mouse stays over the icon. Some button requires  explanations. </p>
+<h4><b>Open</b></h4>
+<p><img src="images/open.png" alt="Load icon" width="32" height="32">To open a file or  a project. You may choose between edit the file (Edit) or edit the file and include it directly in the current project (Include). If the extension is <i>.prj</i>, a   &quot;Load&quot; button replaces the &quot;Include&quot; button to open the project as current project.<br>
+Projects previously opened may be accessed directly from a tooltip (see below). </p>
+<h4><b>Save</b></h4>
+<p><img src="images/save.png" alt="Save icon" width="32" height="32"> To save the content under a new filename. To update a file previously loaded, without  dialog box, type CTRL-S instead. If the document has the Markdown format (and its file the .md extension), you have just to replace the extension by .html to get it converted, thank to the Markdown-It module included. </p>
+
+<p><img src="images/aedit-go-to-line.jpg" alt="To to a line number..." width="159" height="75">This is a set on the toolbar formed by an icon and a text input field. Hovering on the arrow icon brings up a tooltip-menu to jump either to the beginning of the document  or at the bottom.<br>
+You can also enter  directly a line number. The editor jumps directly to the number entered after a short time after the strike, it is useless to hit Enter.</p>
+
+<h4><b>Insertion</b></h4>
+<p><img src="images/insert.png" alt="Iccn to insert" width="32" height="32"> List of elements to insert.<br></p>
+
+<div style="clear:both">
+<ul>
+  <li>/* */ Comment: Select a text and click on this line to put the text in a comment, for languages which support these symboles.</li>
+  <li>No /* */ Uncomment: Put the cuseur inside a comment and click on this line to make the code active.</li>
+  <li>Link: Insert a link with the selected text as anchor.</li>
+  <li>Table: Insert a table.    </li>
+</ul>
+</div>
+
+<h4><b>Preview</b></h4>
+<p><img src="images/preview.png" width="32" height="32"> Opens a window to display the document in final form, such as a web page if the edited file is in HTML or Markdown.<br> When you edit the document and save it with CTRL-S the page is updated. You can also click on the preview icon for the update.</p>
+
+<h4><b>Close</b></h4>
+<p><img src="images/exit.png" width="32" height="32"> This button is important because, before to close the program, it saves the environment and verifies also that the current document is saved.<br>If you close the application without to use this button, your last edits will be lost.</p>
+
+<h3>Shortcuts</h3>
+<p>CTRL-S: Save the content either in the database under the same title, or in the same file. If a database is loaded and the document has been added to it, it is updated too. </p>
+<p>CTRL-C: Copy the selection.</p>
+<p>CTRL-X: Cut the selection. </p>
+<p>CTRL-V: Past the selection. </p>
+<p>CTRL-Z: Undo the last edit. </p>
+<p>CTRL-Y: Redo what have been cancelled. </p>
+<p>CTRL-G: Go to line.</p>
+<p>CTRL-F: Find. (F3 for next occurence).</p>
+<p>CTRL-H: Find and replace.   </p>
+<p>TAB: Indent.</p>
+<p>SHIFT-TAB: Unindent. </p>
+<h3>Loading and saving</h3>
+<p>Loading a file is done with a native window.</p>
+<p>Click Cancel to return to the editor or Open to open the document.</p>
+<p>Saving is done either by clicking the save icon, which opens a custom dialog box allowing you to choose the file name and location, or by pressing CTRL-S to update the existing file.</p>
+<p>When you load a document and the current document has not been saved (yellow lightbulb icon), the save window opens first with three options:</p>
+<ul>
+  <li>Cancel: The window closes without any further action. You can then simply save with CTRL-S and resume loading.</li>
+  <li>Ignore: The document is loaded, replacing the current content without it been saved.</li>
+  <li>Save: The current content is saved, and the load window then opens.</li>
+</ul>
+<h3>Project management</h3>
+<p>A project, since version 4, consists of a directory and an active file, which is the last edited file. Each project has its own active file.</p>
+<p>The left panel contains two tabs: the left tab displays the files of a project, the contents of a directory and subdirectories, and the right tab displays the list of projects.</p>
+<p>When you click on a project name, its directory is displayed, and its active file replaces the document in the editing window.</p>
+<h4>Creating a Project</h4>
+<p>To create a project, type the path to a directory in the left panel and click the arrow on the right to display the project's contents. Then click the icon <img src="images/prjadd.png" width="22" height="22" class="insert"/> above to add this directory to the project list.</p>
+<p>There's an even faster way. Click the <img src="images/prjopen.png" width="22" height="22" class="insert"/> icon in the left panel next to the + and - icons. Navigate to the directory and click on a file. This file becomes the active file and is displayed in the editing window. The content of the directory appears on the left, and its name is added to the project list.</p>
+<p>To remove a folder from the list, select it—this will display its contents—and click the <img src="images/prjrem.png" width="22" height="22" class="insert"> icon.<br style="clear:both">
+</p>
+<hr>
+<p><small>&copy; 2015-2026 Denis Sureau</small></p>
+</body>
+</html>
