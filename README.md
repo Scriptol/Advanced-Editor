@@ -7,8 +7,6 @@ This source code editor is specially suited for switching frequently between sev
 
 Additionaly you can easily customize the editor thanks to the HTML + CSS interface and add functions to the JavaScript code.
 
-The "main" branch stores the last version for Node.js and a browser, the previous "master" branch stores the old version for Electron 11.
-
 More infos: 
 
 In English :
