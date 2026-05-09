@@ -1354,8 +1354,6 @@ var winsave = function() {
     });    
 }
     
-
-
 function save(winflag) {
     if(editor.getValue().length == 0) return; 
     const nflag = AEditFileName == undefined || AEditFileName == "";
@@ -1367,7 +1365,7 @@ function save(winflag) {
         return
     }
     editor.focus();
-    setActiveRow();
+    getActiveRow()
     let content = editor.getValue();
     if(content.length == 0) return; 
     let a = { 
