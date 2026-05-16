@@ -18,7 +18,8 @@ var operatingSystem = "win";
 
 function createHttpServer() {
     return http.createServer((req, res) => {
-        let filePath = '.' + req.url;
+        //let filePath = '.' + req.url;
+        let filePath = '.' + req.url.split('?')[0];
         if (filePath === './') filePath = './aeditor.html';
 
         const extname = path.extname(filePath).toLowerCase();
@@ -185,7 +186,7 @@ wss.on('connection', (ws) => {
             }
             catch (err) {
                 ws.send(JSON.stringify({ 
-                    type: 'error',
+                    type: 'ERROR',
                     message: "Enable to open the folder : " + err.message 
                 }));
             }
@@ -248,6 +249,7 @@ wss.on('connection', (ws) => {
             }));                        
         }    
         else if (data.type === 'GET_CONTENT') {
+            console.log("GET " + JSON.stringify(data))
             const filePath = path.resolve(data.path);
 
             fs.readFile(filePath, 'utf8', (err, content) => {
@@ -327,7 +329,7 @@ async function createServerOnFreePort(start = 8080) {
 
     shellSocket(server);
 
-    const url = `http://localhost:${port}`;
+    const url = `http://localhost:${port}?p=${port}`;
     console.log(`Started on ${url}`);
 
     setTimeout(() => {

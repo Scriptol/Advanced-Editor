@@ -1,4 +1,5 @@
-<!--
+        buildRecentTab()   
+        return  <!--
 Advanced Editor (formerly Cryonie Editor) 
 (c) 2016-2026 Denis Sureau
 License Creative Common
@@ -103,7 +104,7 @@ Make use of:
             <img class="primage" id="closeFolder" src="images/prjexit.png" title="Close folder" 
                onclick="closeFolder()">
 -->                             
-            <img class="primage" id="pickFolder" src="images/prjopen.png" title="Create a project" 
+            <img class="primage" src="images/prjopen.png" title="Create a project" 
                onclick="createProject()">
         </div>
         <div id="folderPathDiv">
@@ -112,14 +113,16 @@ Make use of:
         </div>
      
         <div class="tabs">
-            <div class="tab active" data-target="prjlist" id="filesTab">Files</div>
-            <div class="tab" data-target="allProjects" id="prjTab">Projects</div>
+            <div class="tab" data-target="allProjects" id="prjTab" title="Projects">&#128448;</div>            
+            <div class="tab" data-target="prjList" id="filesTab" title="Files">&#128449;</div>
+            <div class="tab active" data-target="recentList" id="lastTab" title="Recents">&#128366;</div>
         </div>  
-        <div id="prjlist" class="content active">
-        </div>  
-        <div id="allProjects" class="content">
-        </div>   
-    </div>  
+        <div class="content-area">
+            <div id="allProjects" class="content"></div>  
+            <div id="prjList" class="content active"></div>  
+            <div id="recentList" class="content"></div>   
+        </div>        
+    </div>  <!--project-->
     <div id="resizer"></div> 
     <div id="panels">
         <div id="epanel">
@@ -138,7 +141,9 @@ Make use of:
 </div> <!--main-->
     
 <script>
-
+const params = new URLSearchParams(window.location.search);
+const port = params.get("p");    
+const socket = new WebSocket(`ws://localhost:${port}`);
 const resizer = document.getElementById('resizer');
 const sidebar = document.getElementById('project');
 
@@ -168,9 +173,11 @@ function stopResize() {
 
 // server access
 
-const socket = new WebSocket('ws://localhost:8080');
+
 let projects = []
+let recents =[]
 let DRIVES = []
+let lastTab = 2
 
 function sendFromInterface(obj) {
     if (!socket) {
@@ -235,7 +242,7 @@ var languageExt = {
 
 // TABS
 
-const tabs = document.querySelectorAll(".tab");
+const tabs = Array.from(document.querySelectorAll(".tab"));
 const contents = document.querySelectorAll(".content");
 
 tabs.forEach(tab => {
@@ -244,8 +251,14 @@ tabs.forEach(tab => {
         contents.forEach(c => c.classList.remove("active"));
         tab.classList.add("active");
         document.getElementById(tab.dataset.target).classList.add("active");
+        lastTab = tabs.indexOf(tab)
     });
 });
+
+
+function getActiveTabIndex() {
+    lastTab = tabs.findIndex(t => t.classList.contains("active"));
+}
 
 // LOADING SYSTEM
 
@@ -284,8 +297,6 @@ document.getElementById('load').addEventListener('change', async (event) => {
     reader.readAsText(file);
 });
 
-
-// OPEN FOLDER BUTTON
    
 async function createProject() {
     if (contentToSave) {
@@ -294,16 +305,24 @@ async function createProject() {
         });
     }
 
-    AEFileDialog('Open', (result, folder) => {
-        //if (result === false) return;
-        //document.getElementById('folderPath').value = folder
-        //openFolder()
+    AEFileDialog('Open', function(result, folder) {
+        if(result == false)  return
+        document.getElementById('folderPath').value = folder
+        openFolder()
+        addFolder()
         return;
-    });
+    }); 
 }
-    
+   
+function openRecents() {
+    const index = inProjects()
+    if(index != -1) {
+        recents = projects[index].recents
+        buildRecentTab()
+    }
+}
 
-async function openFolder() {
+async function openFolder() {  
     const path = document.getElementById('folderPath').value;
     if (!path) {
         alert("No path given to open");
@@ -360,7 +379,7 @@ function driveForProjects(drive) {
 
 function displayFiles(files) {
     const pathInput = document.getElementById('folderPath');
-    const listContainer = document.getElementById('prjlist');
+    const listContainer = document.getElementById('prjList');
     listContainer.innerHTML = ''; 
 
     if (isDriveInProject) {
@@ -444,20 +463,94 @@ function displayFiles(files) {
 
 // Project management
 
-function addEntry(folder, lastFile) {
-    const plist = document.getElementById("allProjects");
+function addProjectEntry(path, active) {
+    const div = document.getElementById("allProjects");
+    const children = Array.from(div.children);
+
+    for (let p of children) {
+        if (p.dataset.path === path) {
+            p.dataset.active = active;
+            p.textContent = path; 
+            return;               
+        }
+    }
+
     const p = document.createElement("p");
-    p.textContent = folder;
-    p.dataset.cache = lastFile;
-    plist.appendChild(p);
+    p.textContent = path;
+    p.dataset.path = path;
+    p.dataset.active = active;
+
+    div.appendChild(p);
 }
 
 
-function buildProjectTab() {
-    let pair = []
+function buildProjectTab() { 
+    if(projects == undefined) return
     document.getElementById("allProjects").innerHTML = ""
-    for (pair of projects) {
-        addEntry(pair[0], pair[1])
+    projects.forEach(p => {
+        addProjectEntry(p.path, p.active);
+    });
+}
+
+function removeRecentEntry(fullPath) { 
+    const index = recents.findIndex(p => p[0] === fullPath);
+    if (index !== -1) {
+        recents.splice(index, 1);
+    }
+
+    const div = document.getElementById("recentList");
+    const children = Array.from(div.children);
+
+    for (let p of children) {
+        if (p.title === fullPath) {
+            p.remove();
+            break;
+        }
+    }
+}
+
+
+function addRecentEntry(fullPath, row) {
+    const div = document.getElementById("recentList");
+    const children = Array.from(div.children);
+
+    for (let p of children) {
+        if (p.title === fullPath) {
+            p.dataset.row = row;
+            return;               
+        }
+    }
+
+    const p = document.createElement("p");
+    const filename = fullPath.split(/[/\\]/).pop();
+    p.title = fullPath;
+    p.dataset.row = row;
+    p.className = "recent-entry";
+
+    const textSpan = document.createElement("span");
+    textSpan.textContent = filename;  
+
+   const trash = document.createElement("span");
+    trash.innerHTML = "&#128465;"; 
+    trash.className = "trash-icon";
+    trash.onclick = (event) => {
+        event.stopPropagation();  
+        removeRecentEntry(fullPath);
+    };    
+    //trash.onclick = () => removeRecentEntry(fullPath);
+    
+    p.appendChild(textSpan);
+    p.appendChild(trash);
+    div.appendChild(p);
+}
+
+
+function buildRecentTab() { 
+    if(recents == undefined) return
+    let pair = []
+    document.getElementById("recentList").innerHTML = ""
+    for (pair of recents) {
+        addRecentEntry(pair[0], pair[1])
     }
 }
 
@@ -472,66 +565,136 @@ function openProject(path) {
     }           
     document.getElementById('folderPath').value = path;    
     openFolder()
+    addRecent()
     openActive()
 }
 
 document.getElementById("allProjects").addEventListener("click", (e) => {
     if (e.target.tagName === "P") {
         const folder = e.target.textContent;
-        //const active = e.target.dataset.cache;
-        //openProject(folder, active);
         openProject(folder);
-        showFiles()
+        showRecents()
     }
 });
- 
+
+document.getElementById("recentList").addEventListener("click", (e) => {
+    if (e.target.tagName === "P") {
+        const fname = e.target.title;
+        getSource(fname);
+    }
+});
+
 function addFolder() {
-    const path = document.getElementById('folderPath').value;  
+    let path = document.getElementById('folderPath').value;  
     if(path == "") return
     if(path.at(-1) !== "/")   path += "/"
-    const index = projects.findIndex(paire => paire[0].toLowerCase() === path.toLowerCase());
-    if(index !== -1) return    
+    path = path.toLowerCase();
 
-    const pair = [path, AEditFileName]
-    if(projects.length==0) {
-        projects[0] = pair
-        buildProjectTab()        
-        return
+    let low = 0, high = projects.length;
+
+    while (low < high) {
+        const mid = (low + high) >> 1;
+        if (projects[mid].path.toLowerCase() < path) low = mid + 1;
+        else high = mid;
     }
-    const key = path.toLowerCase();
-    let i = 0;
-    while (i < projects.length && projects[i][0].toLowerCase() < key) {
-        i++;
+
+    const entry = {
+        path: path,
+        active: AEditFileName,
+        recents: recents
     }
-    projects.splice(i, 0, pair);
+
+    projects.splice(low, 0, entry); 
     buildProjectTab()
 }
 
-function removeFolder() {
+
+function inProjects() {
     const path = document.getElementById('folderPath').value;
-    if(path == "") return false;
-    const index = projects.findIndex(paire => paire[0] === path);
-    if (index !== -1) {
-        projects.splice(index, 1);
-        buildProjectTab()
-        return true; 
+    if(path == "") return -1;
+    const index = projects.findIndex(e => e.path === path);
+    return index;    
+}
+
+function removeFolder() {
+    const index = inProjects();
+    if (index === -1) return false;
+
+    projects.splice(index, 1);
+    buildProjectTab()
+    return true;
+}  
+
+
+function addRecent() {
+    let pos = editor.getCursorPosition()
+    let row = pos.row
+
+    if(config.maxRecents=== undefined) {
+        config.maxRecents = 32
+    }  
+
+    const index = inProjects()
+    if(index !== -1) {
+        recents = projects[index].recents;
     }
-    return false;             
+
+    if(typeof recents === 'undefined') recents = []
+    const pair = [AEditFileName, row]
+    if(recents.length==0) {
+        recents[0] = pair
+        buildRecentTab() 
+        return
+    }
+
+    const rindex = recents.findIndex(r => r[0].toLowerCase() === AEditFileName.toLowerCase());
+    if (rindex !== -1) {
+        recents[rindex][1]=row
+        return  
+    }
+
+    recents.unshift(pair);
+    if(recents.length >= config.maxRecents) {
+        recents.pop();
+    }    
+    
+    buildRecentTab()
 }
 
-// switch tab
 
-function showFiles() {
-    const filesTab = document.getElementById("filesTab");
-    const prjTab = document.getElementById("prjTab");
-    const prjlist = document.getElementById("prjlist");
-    const allProjects = document.getElementById("allProjects");
+function updateRecent() {
+    const index = inProjects();
+    if(index !==-1) {
+        recents = projects[index].recents;
+    }    
+    const rIndex = recents.findIndex(r => r[0].toLowerCase() === AEditFileName.toLowerCase());
+    if (rIndex === -1) return false;
 
-    filesTab.classList.add("active");
-    prjTab.classList.remove("active");
-    prjlist.classList.add("active");
-    allProjects.classList.remove("active");    
+    let pos = editor.getCursorPosition()
+    recents[rIndex][1] = pos.row ;
+    return true;
 }
+
+
+// Select a tab to display
+
+const allTabs = [
+    { tab: "prjTab", content: "allProjects" },
+    { tab: "filesTab", content: "prjList" },
+    { tab: "lastTab", content: "recentList" }
+];
+
+function showTabContent(index = 0) { 
+    if (index < 0 || index >= allTabs.length) index = 0;
+    allTabs.forEach((item, i) => {
+        const tab = document.getElementById(item.tab);
+        const content = document.getElementById(item.content);
+        tab.classList.toggle("active", i === index);
+        content.classList.toggle("active", i === index);
+    });
+}
+
+
 
 editor.setTheme("ace/theme/dreamweaver");
 editor.getSession().setMode("ace/mode/html"); 
@@ -879,7 +1042,7 @@ function AEFileDialog(mode, cb) {
     }));
 
     btnAction.onclick = () => {
-        const fname = nameInput.value.trim();
+        const fname = nameInput.value.trim(); 
         if (!fname) return nameInput.focus();
         if(currentPath.at(-1) != "/") currentPath += "/"
 
@@ -898,7 +1061,7 @@ function AEFileDialog(mode, cb) {
             openProject(currentPath)
             addFolder()
         }
-        if(cb) cb(true, "")
+        if(cb) cb(true, currentPath)
         sDialog.close();
     };
 
@@ -933,6 +1096,7 @@ function clearDoc() {
         newDoc();
         return
     }
+    addRecent()
     AEFileDialog('Save', function(result, name) {
         if(result == true) {
             newDoc();
@@ -991,7 +1155,7 @@ function extractNode(fname) {
 
 
 
-function getSource(filepath) {
+function getSource(filepath) { 
     if(lastPanel != ePanel) return    
     if (contentToSave) {
         if (!confirm("Content not saved. Continue ?")) {
@@ -1044,6 +1208,7 @@ function goline(element) {
 
 
 function quitSub() {
+    config.lastTab = lastTab
     saveConfig("aeditor.ini.js")
     setTimeout(function() { this.close();}, 100);
     sendFromInterface({ 'type': 'QUIT' });
@@ -1193,20 +1358,20 @@ function editDoc(jobj) {
     editor.scrollToLine(row);
     changedStatus(false);
     config.dir=extractDir(AEditFileName);
-    config.active=AEditFileName
-    const index = config.projects.findIndex(p => p[0] === config.folder);
-    if (index !== -1) {
-        config.projects[index][1] = AEditFileName;
-    }    
-
-    //saveIni();          
+    config.active.file=AEditFileName
+    const index = inProjects()
+    if(index !== -1) {
+        config.projects[index].active = AEditFileName;
+    }
+    addRecent()
     editor.focus(); 
 }
 
-function openActive() {
-    const index = config.projects.findIndex(p => p[0] === config.folder);
+function openActive() { 
+    const index = inProjects() 
     if(index == -1) return false
-    const fname = config.projects[index][1]
+    const fname = config.projects[index].active
+
     if(fname == undefined || fname == "") return false
     getSource(fname)
     return true
@@ -1217,7 +1382,8 @@ socket.onmessage = (event) => {
     switch(jobj.type) {
     case 'directory-list':
         displayFiles(jobj.files);
-        showFiles()
+        openRecents()
+        showTabContent(lastTab)        
         openActive()
         break;
     case "openDoc":    
@@ -1423,15 +1589,27 @@ window.onload=function() {
     display(null);
     rootdir = config.dir
     projects = config.projects
-    //document.getElementById('folderPath').value = localStorage.getItem('lastFolder') || '';
-    document.getElementById('folderPath').value = config.folder || '';
-    buildProjectTab()
-    openFolder()
-    if( !openActive()) {
-        if(config.active != undefined && config.active != "") {
-            getSource(config.active)
+    lastTab = config.lastTab || 2
+    if(config.folder !== undefined && config.folder != "") {
+        document.getElementById('folderPath').value = config.folder;
+    }    
+
+    const index = inProjects()
+    if(index != -1) {
+        recents = projects[index].recents
+        openFolder()
+    }
+    else {
+        if(typeof config.active === Object) {
+            recents = config.active.recents
+            getSource(config.active.file)
         }
     }
+
+    buildRecentTab()
+    buildProjectTab()
+    showTabContent(lastTab)
+
 }
 
 </script>
