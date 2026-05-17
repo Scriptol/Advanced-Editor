@@ -109,7 +109,7 @@ Make use of:
         </div>
         <div id="folderPathDiv">
             <input type="text" id="folderPath" value="C:/">
-            <span id="folderArrow" onClick="openFolder()" >➤</span>
+            <span id="folderArrow" onClick="openFolder(1)" >➤</span>
         </div>
      
         <div class="tabs">
@@ -308,7 +308,7 @@ async function createProject() {
     AEFileDialog('Open', function(result, folder) {
         if(result == false)  return
         document.getElementById('folderPath').value = folder
-        openFolder()
+        openFolder(1)
         addFolder()
         return;
     }); 
@@ -322,7 +322,7 @@ function openRecents() {
     }
 }
 
-async function openFolder() {  
+async function openFolder(tab) {  
     const path = document.getElementById('folderPath').value;
     if (!path) {
         alert("No path given to open");
@@ -330,7 +330,8 @@ async function openFolder() {
     }
     socket.send(JSON.stringify({
         type: 'LIST_FOLDER',
-        path: path 
+        path: path,
+        tab: tab 
     }));
     config.folder = path;
 }
@@ -342,7 +343,7 @@ function goToParent() {
     if (parts.length > 1) {
         parts.pop(); // remove last part of the path
         pathInput.value = parts.join('/');
-        openFolder();
+        openFolder(1);
     }
 }
 
@@ -370,7 +371,7 @@ function driveForProjects(drive) {
             isDriveInProject = false;  
             currentPath = drive + "/";
             document.getElementById('folderPath').value = currentPath;
-            openFolder()
+            openFolder(1)
         };
 
         return item;
@@ -413,7 +414,7 @@ function displayFiles(files) {
         if (parts.length > 1) {
             parts.pop(); // remove last part of the path
             pathInput.value = parts.join('/');
-            openFolder();
+            openFolder(1);
         }
     };
 
@@ -445,7 +446,7 @@ function displayFiles(files) {
 
             if (file.isDirectory) {
                 pathInput.value = newPath;
-                openFolder(); 
+                openFolder(1); 
             } else {
                 setActiveRow(); 
                 if(aPanel.style.display == "block") {
@@ -529,6 +530,11 @@ function addRecentEntry(fullPath, row) {
 
     const textSpan = document.createElement("span");
     textSpan.textContent = filename;  
+    textSpan.onclick = (event) => {
+        event.stopPropagation();  
+        const fullPath = event.currentTarget.parentElement.title;
+        getSource(fullPath);
+    };      
 
    const trash = document.createElement("span");
     trash.innerHTML = "&#128465;"; 
@@ -537,7 +543,6 @@ function addRecentEntry(fullPath, row) {
         event.stopPropagation();  
         removeRecentEntry(fullPath);
     };    
-    //trash.onclick = () => removeRecentEntry(fullPath);
     
     p.appendChild(textSpan);
     p.appendChild(trash);
@@ -564,7 +569,7 @@ function openProject(path) {
         }); 
     }           
     document.getElementById('folderPath').value = path;    
-    openFolder()
+    openFolder(2)
     addRecent()
     openActive()
 }
@@ -573,7 +578,6 @@ document.getElementById("allProjects").addEventListener("click", (e) => {
     if (e.target.tagName === "P") {
         const folder = e.target.textContent;
         openProject(folder);
-        showRecents()
     }
 });
 
@@ -1012,7 +1016,7 @@ function AEFileDialog(mode, cb) {
                 AEditFileName = currentPath + sep + nameInput.value;
                 displayFileName();
                 if(currentPath ===  document.getElementById('folderPath').value) {
-                    openFolder()
+                    openFolder(1)
                 }
                 sDialog.close();
                 if(cb) cb(true, AEditFileName);
@@ -1024,7 +1028,7 @@ function AEFileDialog(mode, cb) {
                 displayFileName();
                 changedStatus(false);
                 document.getElementById('folderPath').value = currentPath;
-                openFolder()
+                openFolder(1)
                 addFolder()
                 sDialog.close();
                 if(cb) cb(true, AEditFileName, data.content);
@@ -1383,8 +1387,8 @@ socket.onmessage = (event) => {
     case 'directory-list':
         displayFiles(jobj.files);
         openRecents()
-        showTabContent(lastTab)        
         openActive()
+        showTabContent(1)
         break;
     case "openDoc":    
         setActiveRow(); 
@@ -1597,7 +1601,7 @@ window.onload=function() {
     const index = inProjects()
     if(index != -1) {
         recents = projects[index].recents
-        openFolder()
+        openFolder(lastTab)
     }
     else {
         if(typeof config.active === Object) {
@@ -1608,8 +1612,6 @@ window.onload=function() {
 
     buildRecentTab()
     buildProjectTab()
-    showTabContent(lastTab)
-
 }
 
 </script>

@@ -181,6 +181,7 @@ wss.on('connection', (ws) => {
                 ws.send(JSON.stringify({ 
                     type: 'directory-list',
                     path: fullPath,
+                    tab : data.tab,
                     files: filesWithInfo 
                 }));
             }
