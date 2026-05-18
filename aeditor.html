@@ -305,11 +305,12 @@ async function createProject() {
         });
     }
 
-    AEFileDialog('Open', function(result, folder) {
+    AEFileDialog('Open', function(result, folder, fname) {
         if(result == false)  return
         document.getElementById('folderPath').value = folder
         openFolder(1)
         addFolder()
+        getSource(fname)
         return;
     }); 
 }
@@ -559,6 +560,7 @@ function buildRecentTab() {
     }
 }
 
+// Select a project and open the folder
 
 function openProject(path) {
     if(contentToSave) {
@@ -570,7 +572,6 @@ function openProject(path) {
     }           
     document.getElementById('folderPath').value = path;    
     openFolder(2)
-    addRecent()
     openActive()
 }
 
@@ -588,30 +589,45 @@ document.getElementById("recentList").addEventListener("click", (e) => {
     }
 });
 
+// Add new project to the list
+
 function addFolder() {
     let path = document.getElementById('folderPath').value;  
     if(path == "") return
     if(path.at(-1) !== "/")   path += "/"
-    path = path.toLowerCase();
+
+    if(inProjects() !== -1) return;
 
     let low = 0, high = projects.length;
-
     while (low < high) {
         const mid = (low + high) >> 1;
-        if (projects[mid].path.toLowerCase() < path) low = mid + 1;
+        if (projects[mid].path.toLowerCase() < path.toLowerCase()) low = mid + 1;
         else high = mid;
     }
 
     const entry = {
         path: path,
         active: AEditFileName,
-        recents: recents
+        recents: []
     }
-
     projects.splice(low, 0, entry); 
     buildProjectTab()
+
+    const index = projects.findIndex(e => e.path === path);
+    if(index !== -1) {
+        recents = projects[index].recents
+    }
+    buildRecentTab()
 }
 
+
+
+
+function inFolderPaths(path) {
+    if(path == "") return -1;
+    const index = projects.findIndex(e => e.path === path);
+    return index;    
+}
 
 function inProjects() {
     const path = document.getElementById('folderPath').value;
@@ -626,6 +642,8 @@ function removeFolder() {
 
     projects.splice(index, 1);
     buildProjectTab()
+    showTabContent(0)
+    clearDoc();
     return true;
 }  
 
@@ -664,6 +682,7 @@ function addRecent() {
     
     buildRecentTab()
 }
+
 
 
 function updateRecent() {
@@ -1021,6 +1040,7 @@ function AEFileDialog(mode, cb) {
                 sDialog.close();
                 if(cb) cb(true, AEditFileName);
             } 
+            /*
             else if (data.type === 'FILE_CONTENT' && !isSaveMode) {
                 const sep = (currentPath == "." || currentPath.at(-1) == "/") ? "" : "/" 
                 AEditFileName = currentPath + sep + nameInput.value;
@@ -1029,10 +1049,11 @@ function AEFileDialog(mode, cb) {
                 changedStatus(false);
                 document.getElementById('folderPath').value = currentPath;
                 openFolder(1)
-                addFolder()
+                //addFolder()
                 sDialog.close();
                 if(cb) cb(true, AEditFileName, data.content);
             }
+            */    
             else if (data.type === 'ERROR') {
                 alert("Error: " + data.message);
             }
@@ -1056,16 +1077,16 @@ function AEFileDialog(mode, cb) {
                 filename: currentPath + "/" + fname,
                 content: editor.getValue()
             }));
+            if(cb) cb(true, currentPath)
         } 
-        else  { // Open
-            socket.send(JSON.stringify({
-                type: 'GET_CONTENT',
-                path: currentPath + "/" + fname,
-            }));
-            openProject(currentPath)
-            addFolder()
+        else  { // create
+            const index = inFolderPaths(currentPath)
+            if(index !== -1) {
+                alert(folder + " already exists")
+                return
+            }  
+            if(cb) cb(true, currentPath, currentPath + "/" + fname)
         }
-        if(cb) cb(true, currentPath)
         sDialog.close();
     };
 
@@ -1374,7 +1395,7 @@ function editDoc(jobj) {
 function openActive() { 
     const index = inProjects() 
     if(index == -1) return false
-    const fname = config.projects[index].active
+    const fname = projects[index].active
 
     if(fname == undefined || fname == "") return false
     getSource(fname)
