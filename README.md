@@ -5,7 +5,7 @@ Require Node.js to run.
 
 This source code editor is specially suited for switching frequently between several small projects. It is very easy to find and to load your scripts in many directories.
 
-Additionaly you can easily customize the editor thanks to the HTML + CSS interface and add functions to the JavaScript code.
+Additionaly you can easily customize the editor thanks to the HTML + CSS interface and add functions to the JavaScript code. 
 
 More infos: 
 

@@ -1,6 +1,5 @@
-        buildRecentTab()   
-        return  <!--
-Advanced Editor (formerly Cryonie Editor) 
+<!--
+Advanced Editor
 (c) 2016-2026 Denis Sureau
 License Creative Common
 
@@ -342,13 +341,13 @@ function goToParent() {
     let currentPath = pathInput.value.trim();
     const parts = currentPath.split(/[/\\]/);
     if (parts.length > 1) {
-        parts.pop(); // remove last part of the path
+        parts.pop(); 
         pathInput.value = parts.join('/');
         openFolder(1);
     }
 }
 
-    // Folder display
+// Folder display
 
 let isDriveInProject = false
 function driveForProjects(drive) {
@@ -454,7 +453,7 @@ function displayFiles(files) {
                     aPanel.style.display = "none";
                     ePanel.style.display = "block";
                 }
-                //alert("load " + newPath)
+                
                 getSource(newPath);
             }
         };
@@ -511,6 +510,36 @@ function removeRecentEntry(fullPath) {
     }
 }
 
+function readTopRow(path) {
+    let row = 0
+    const index = recents.findIndex(r => r[0] === path.toLowerCase());
+    //alert(path.toLowerCase() + " " + index + " " + recents[index][1])
+    if (index !== -1) {
+        row = recents[index][1]
+        //alert("so " + row)
+    }     
+    return row;
+}
+
+function storeTopRow(path, row) {
+    const index = recents.findIndex(r => r[0] === path.toLowerCase());
+    if (index !== -1) {
+        recents[index][1] = row
+        return true
+    }     
+    return false
+}
+
+
+function updateRecents() {
+    const index = inProjects();
+    if(index === -1) return false
+    recents = projects[index].recents;
+
+    const firstVisible = editor.getFirstVisibleRow();
+    storeTopRow(AEditFileName, firstVisible)
+    return true;
+}
 
 function addRecentEntry(fullPath, row) {
     const div = document.getElementById("recentList");
@@ -518,7 +547,7 @@ function addRecentEntry(fullPath, row) {
 
     for (let p of children) {
         if (p.title === fullPath) {
-            p.dataset.row = row;
+            p.dataset.row = row;  // update only
             return;               
         }
     }
@@ -531,10 +560,11 @@ function addRecentEntry(fullPath, row) {
 
     const textSpan = document.createElement("span");
     textSpan.textContent = filename;  
-    textSpan.onclick = (event) => {
+    textSpan.onclick = (event) => { 
         event.stopPropagation();  
-        const fullPath = event.currentTarget.parentElement.title;
-        getSource(fullPath);
+        updateRecents()
+        const newPath = event.currentTarget.parentElement.title;
+        getSource(newPath);
     };      
 
    const trash = document.createElement("span");
@@ -579,13 +609,6 @@ document.getElementById("allProjects").addEventListener("click", (e) => {
     if (e.target.tagName === "P") {
         const folder = e.target.textContent;
         openProject(folder);
-    }
-});
-
-document.getElementById("recentList").addEventListener("click", (e) => {
-    if (e.target.tagName === "P") {
-        const fname = e.target.title;
-        getSource(fname);
     }
 });
 
@@ -649,31 +672,26 @@ function removeFolder() {
 
 
 function addRecent() {
-    let pos = editor.getCursorPosition()
-    let row = pos.row
-
     if(config.maxRecents=== undefined) {
         config.maxRecents = 32
     }  
 
+    const firstVisible = editor.getFirstVisibleRow();     
     const index = inProjects()
     if(index !== -1) {
         recents = projects[index].recents;
+        recents[index][1] = firstVisible;
     }
 
     if(typeof recents === 'undefined') recents = []
-    const pair = [AEditFileName, row]
+    const pair = [AEditFileName, firstVisible]
     if(recents.length==0) {
         recents[0] = pair
         buildRecentTab() 
         return
     }
 
-    const rindex = recents.findIndex(r => r[0].toLowerCase() === AEditFileName.toLowerCase());
-    if (rindex !== -1) {
-        recents[rindex][1]=row
-        return  
-    }
+    if(storeTopRow(AEditFileName, firstVisible)) return
 
     recents.unshift(pair);
     if(recents.length >= config.maxRecents) {
@@ -684,17 +702,14 @@ function addRecent() {
 }
 
 
-
 function updateRecent() {
     const index = inProjects();
     if(index !==-1) {
         recents = projects[index].recents;
     }    
-    const rIndex = recents.findIndex(r => r[0].toLowerCase() === AEditFileName.toLowerCase());
-    if (rIndex === -1) return false;
+    const firstVisible = editor.getFirstVisibleRow(); 
+    storeTopRow(AEditFileName, firstVisible)
 
-    let pos = editor.getCursorPosition()
-    recents[rIndex][1] = pos.row ;
     return true;
 }
 
@@ -806,10 +821,11 @@ function displayFileName() {
 }
 
 
-/**
- * @param {string} mode - 'save' ou 'load'
- * @param {function} cb - Callback(success, path, content)
- */
+/*
+  mode - 'save' ou 'load'
+  cb - Callback(success, path [, filename])
+*/
+
 function AEFileDialog(mode, cb) {
     let isSaveMode = false;
     let isDriveListMode = false;
@@ -1040,20 +1056,6 @@ function AEFileDialog(mode, cb) {
                 sDialog.close();
                 if(cb) cb(true, AEditFileName);
             } 
-            /*
-            else if (data.type === 'FILE_CONTENT' && !isSaveMode) {
-                const sep = (currentPath == "." || currentPath.at(-1) == "/") ? "" : "/" 
-                AEditFileName = currentPath + sep + nameInput.value;
-                editor.setValue(data.content); // replace content
-                displayFileName();
-                changedStatus(false);
-                document.getElementById('folderPath').value = currentPath;
-                openFolder(1)
-                //addFolder()
-                sDialog.close();
-                if(cb) cb(true, AEditFileName, data.content);
-            }
-            */    
             else if (data.type === 'ERROR') {
                 alert("Error: " + data.message);
             }
@@ -1121,7 +1123,6 @@ function clearDoc() {
         newDoc();
         return
     }
-    addRecent()
     AEFileDialog('Save', function(result, name) {
         if(result == true) {
             newDoc();
@@ -1180,7 +1181,7 @@ function extractNode(fname) {
 
 
 
-function getSource(filepath) { 
+function getSource(fpath) { 
     if(lastPanel != ePanel) return    
     if (contentToSave) {
         if (!confirm("Content not saved. Continue ?")) {
@@ -1188,9 +1189,10 @@ function getSource(filepath) {
 			save(true);
         }
     }
-
+    let topRow = readTopRow(fpath)
     var a = { 
-        'path' : filepath, 
+        'path' : fpath,
+        'row' : topRow,         
         'type': 'GET_CONTENT'
     };
     sendFromInterface(a);
@@ -1232,22 +1234,32 @@ function goline(element) {
 }
 
 
+  
+
+window.addEventListener('beforeunload', function(event) {
+    if(modified) {
+        var r = confirm('Content not saved. Exit anyway?')
+        if(!r) {
+            return event.returnValue = 'No'
+        }
+    }
+});
+    
+
 function quitSub() {
     config.lastTab = lastTab
     saveConfig("aeditor.ini.js")
-    setTimeout(function() { this.close();}, 100);
-    sendFromInterface({ 'type': 'QUIT' });
-}    
-    
+    window.close();            
+}
+
 function quit() {
     if(!contentToSave) {
-        quitSub();
+        quitSub()
         return
     }
     AEFileDialog('Save', function(result, name) {
         if(result) {
-            contentToSave=false
-            quitSub();
+            quitSub()
         }
     });
     return 
@@ -1379,8 +1391,6 @@ function editDoc(jobj) {
         mode = "ace/mode/" + languageExt[jobj.ext];
     }
     editor.getSession().setMode(mode); 
-    var row = getActiveRow();   
-    editor.scrollToLine(row);
     changedStatus(false);
     config.dir=extractDir(AEditFileName);
     config.active.file=AEditFileName
@@ -1388,6 +1398,12 @@ function editDoc(jobj) {
     if(index !== -1) {
         config.projects[index].active = AEditFileName;
     }
+    let row = jobj.row
+    if(row !== undefined && row > 0) {
+        const h = editor.renderer.lineHeight;
+        editor.renderer.scrollToY(h * row);
+    }
+
     addRecent()
     editor.focus(); 
 }
@@ -1395,9 +1411,10 @@ function editDoc(jobj) {
 function openActive() { 
     const index = inProjects() 
     if(index == -1) return false
-    const fname = projects[index].active
 
+    const fname = projects[index].active
     if(fname == undefined || fname == "") return false
+
     getSource(fname)
     return true
 }

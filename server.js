@@ -97,45 +97,45 @@ function checkPath(inputPath) {
 
 
 // Server WebSocket (Replace ipcMain)
+
 function shellSocket(server) {
+    const wss = new WebSocket.Server({ server });
 
-const wss = new WebSocket.Server({ server });
+    wss.on('connection', (ws) => {
+        console.log("Client connected");
+        let missingDir = ""
 
-wss.on('connection', (ws) => {
-    console.log("Client connected");
-    let missingDir = ""
+        // get list of drives
+        const sendDriveList = () => {
+            if(operatingSystem != "win") {
+                const drives = ["/"]
+                ws.send(JSON.stringify({
+                    type: "DRIVE_LIST",
+                    drives
+                }));  
+                return      
+            }
+        exec('powershell -command "Get-PSDrive -PSProvider FileSystem | Select-Object -ExpandProperty Name"', 
+        (err, stdout) => {
+            if (err) {
+                ws.send(JSON.stringify({
+                    type: "ERROR",
+                    message: "Unable to list drives"
+                }));
+                return;
+            }
 
-    // get list of drives
-    const sendDriveList = () => {
-        if(operatingSystem != "win") {
-            const drives = ["/"]
-            ws.send(JSON.stringify({
-                type: "DRIVE_LIST",
-                drives
-            }));  
-            return      
-        }
-    exec('powershell -command "Get-PSDrive -PSProvider FileSystem | Select-Object -ExpandProperty Name"', 
-    (err, stdout) => {
-        if (err) {
-            ws.send(JSON.stringify({
-                type: "ERROR",
-                message: "Unable to list drives"
-            }));
-            return;
-        }
-
-        const drives = stdout
+            const drives = stdout
             .split(/\r?\n/)
             .map(l => l.trim())
             .filter(l => /^[A-Z]$/i.test(l))   // garde C, D, P
             .map(l => l + ":");                // transforme en C:, D:, P:
 
-        ws.send(JSON.stringify({
-            type: "DRIVE_LIST",
-            drives
-        }));
-    });
+            ws.send(JSON.stringify({
+                type: "DRIVE_LIST",
+                drives
+            }));
+        });
     };
 
     sendDriveList();    
@@ -267,6 +267,7 @@ wss.on('connection', (ws) => {
                     type: "openDoc",
                     filename: data.path,
                     content: content,
+                    row : data.row,
                     ext: ext,
                     project: data.project || null
                 }));
@@ -278,13 +279,13 @@ wss.on('connection', (ws) => {
             var message = "Setup " + (result ? 'Not saved' : 'Saved') + ' into ' + fullpath;   
             console.log(message)         
         }
-        else if(data.type=="QUIT")  {
-            console.log("Bye...");
-            process.exit(0);
-        }
         else if(data.command == "mouse") {
         }
-    });  //ws
+    });  //ws on message
+    ws.on('close', () => {
+        console.log("Bye...");
+        process.exit(0);
+    });
 }); // wss
 } // function shellServer
 

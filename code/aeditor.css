@@ -107,14 +107,14 @@
 #resizer {
     width: 1px; 
     cursor: col-resize;
-    background: #333; /* Couleur sombre pour rester discret */
+    background: #333; 
     height: 100%;
     z-index: 10;
     transition: background 0.2s;
 } 
 
 #resizer:hover {
-    background: #666; /* Devient plus clair au survol */
+    background: #666; 
 }
 
 #panels {
@@ -327,7 +327,7 @@
     overflow-y:auto; 
 }
 
-#prjList p, #allprojects p, #recentList p {
+#prjList p, #allProjects p, #recentList p {
     margin:2px 4px 2px 2px;
     padding:0 4px 0 4px;
     overflow:hidden;
@@ -337,7 +337,7 @@
 }
 
 
-#prjList p:hover, #allprojects p:hover, #recentList p:hover {
+#prjList p:hover, #allProjects p:hover, #recentList p:hover {
 	border:1px solid #aaa;	
 }
 
