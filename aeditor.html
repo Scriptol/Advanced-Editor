@@ -660,37 +660,6 @@ function removeFolder() {
     return true;
 }  
 
-/*
-function addRecent() {
-    if(config.maxRecents=== undefined) {
-        config.maxRecents = 32
-    }  
-
-    const firstVisible = editor.getFirstVisibleRow();     
-    const index = inProjects()
-    if(index !== -1) {
-        recents = projects[index].recents;
-        recents[index][1] = firstVisible;
-    }
-
-    if(typeof recents === 'undefined') recents = []
-    const pair = [AEditFileName, firstVisible]
-    if(recents.length==0) {
-        recents[0] = pair
-        buildRecentTab() 
-        return
-    }
-
-    if(storeTopRow(AEditFileName, firstVisible)) return
-
-    recents.unshift(pair);
-    if(recents.length >= config.maxRecents) {
-        recents.pop();
-    }    
-    
-    buildRecentTab()
-}
-*/
 
 function addRecent() {
     config.maxRecents ??= 32;
