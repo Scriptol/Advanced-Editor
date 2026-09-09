@@ -267,7 +267,6 @@ function shellSocket(server) {
                     type: "openDoc",
                     filename: data.path,
                     content: content,
-                    row : data.row,
                     ext: ext,
                     project: data.project || null
                 }));

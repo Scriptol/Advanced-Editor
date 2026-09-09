@@ -510,19 +510,9 @@ function removeRecentEntry(fullPath) {
     }
 }
 
-function readTopRow(path) {
-    let row = 0
-    const index = recents.findIndex(r => r[0] === path.toLowerCase());
-    //alert(path.toLowerCase() + " " + index + " " + recents[index][1])
-    if (index !== -1) {
-        row = recents[index][1]
-        //alert("so " + row)
-    }     
-    return row;
-}
 
 function storeTopRow(path, row) {
-    const index = recents.findIndex(r => r[0] === path.toLowerCase());
+    const index = recents.findIndex(r => r[0].toLowerCase() === path.toLowerCase());
     if (index !== -1) {
         recents[index][1] = row
         return true
@@ -670,7 +660,7 @@ function removeFolder() {
     return true;
 }  
 
-
+/*
 function addRecent() {
     if(config.maxRecents=== undefined) {
         config.maxRecents = 32
@@ -700,6 +690,36 @@ function addRecent() {
     
     buildRecentTab()
 }
+*/
+
+function addRecent() {
+    config.maxRecents ??= 32;
+
+    const firstVisible = editor.getFirstVisibleRow();
+    const projectIndex = inProjects();
+    if (projectIndex === -1) return false;
+
+    let recents = projects[projectIndex].recents;
+    if (!Array.isArray(recents)) {
+        recents = [];
+        projects[projectIndex].recents = recents;   // ✔️ nécessaire uniquement ici
+    }
+
+    const normalized = AEditFileName.toLowerCase();
+    if (storeTopRow(normalized, firstVisible)) {
+        buildRecentTab();
+        return true;
+    }
+
+    recents.unshift([AEditFileName, firstVisible]);
+    if (recents.length > config.maxRecents) {
+        recents.pop();
+    }
+
+    buildRecentTab();
+    return true;
+}
+
 
 
 function updateRecent() {
@@ -1189,10 +1209,8 @@ function getSource(fpath) {
 			save(true);
         }
     }
-    let topRow = readTopRow(fpath)
     var a = { 
         'path' : fpath,
-        'row' : topRow,         
         'type': 'GET_CONTENT'
     };
     sendFromInterface(a);
@@ -1248,6 +1266,12 @@ window.addEventListener('beforeunload', function(event) {
 
 function quitSub() {
     config.lastTab = lastTab
+    const firstVisible = editor.getFirstVisibleRow();
+    const projectIndex = inProjects();
+    if (projectIndex === -1) return false;
+    const normalized = AEditFileName.toLowerCase();
+    storeTopRow(normalized, firstVisible)
+    
     saveConfig("aeditor.ini.js")
     window.close();            
 }
@@ -1398,8 +1422,13 @@ function editDoc(jobj) {
     if(index !== -1) {
         config.projects[index].active = AEditFileName;
     }
-    let row = jobj.row
-    if(row !== undefined && row > 0) {
+    let row = 0
+    const rindex = recents.findIndex(r => r[0].toLowerCase() === AEditFileName.toLowerCase());
+  
+    if (rindex !== -1) {
+        row = recents[rindex][1]
+    }  
+    if(row > 0) {
         const h = editor.renderer.lineHeight;
         editor.renderer.scrollToY(h * row);
     }
